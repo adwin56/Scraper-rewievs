@@ -3,6 +3,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+header('Content-Type: application/json');
+
 try {
     // Укажите URL страницы с отзывами на Яндекс Картах
     $url = 'https://yandex.ru/maps/org/daymond_klinik/164798670887/reviews/?indoorLevel=1&ll=49.123700%2C55.790012&z=16';
@@ -18,7 +20,6 @@ try {
     $dom = new DOMDocument();
     @$dom->loadHTML($html);
 
-    
     // Создание объекта XPath для удобного парсинга
     $xpath = new DOMXPath($dom);
 
@@ -44,15 +45,12 @@ try {
         ];
     }
 
-    // Возврат данных в формате JSON
-    header('Content-Type: application/json');
     echo json_encode($reviews);
-} catch (Exception $e) {
-    // Логирование ошибки в логи сервера
-    error_log($e->getMessage());
 
+} catch (Exception $e) {
+    // Логирование ошибки в лог сервера
+    error_log($e->getMessage());
     // Возврат ошибки в формате JSON
-    header('Content-Type: application/json');
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>
