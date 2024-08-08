@@ -18,6 +18,7 @@ try {
     $dom = new DOMDocument();
     @$dom->loadHTML($html);
 
+    
     // Создание объекта XPath для удобного парсинга
     $xpath = new DOMXPath($dom);
 
