@@ -32,18 +32,26 @@ try {
     }
 
     foreach ($reviewNodes as $node) {
-        $author = $xpath->query(".//div[contains(@class, 'business-review-view__author-name')]/a/span", $node)->item(0)->textContent ?? 'Неизвестный автор';
-        $date = $xpath->query(".//span[contains(@class, 'business-review-view__date')]", $node)->item(0)->textContent ?? 'Дата отсутствует';
-        $rating = $xpath->query(".//div[contains(@class, 'business-review-view__rating')]/div/meta[@itemprop='ratingValue']", $node)->item(0)->getAttribute('content') ?? 'Без рейтинга';
-        $reviewText = $xpath->query(".//div[contains(@class, 'business-review-view__body')]/span/span", $node)->item(0)->textContent ?? 'Текст отсутствует';
+    $authorNode = $xpath->query(".//div[contains(@class, 'business-review-view__author-name')]/a/span", $node)->item(0);
+    $author = $authorNode ? $authorNode->textContent : 'Неизвестный автор';
 
-        $reviews[] = [
-            'author' => trim($author),
-            'date' => trim($date),
-            'rating' => (int)$rating,  // Приведение к числу
-            'reviewText' => trim($reviewText)
-        ];
-    }
+    $dateNode = $xpath->query(".//span[contains(@class, 'business-review-view__date')]", $node)->item(0);
+    $date = $dateNode ? $dateNode->textContent : 'Дата отсутствует';
+
+    $ratingNode = $xpath->query(".//div[contains(@class, 'business-review-view__rating')]/div/meta[@itemprop='ratingValue']", $node)->item(0);
+    $rating = $ratingNode ? (int)$ratingNode->getAttribute('content') : 'Без рейтинга';
+
+    $reviewTextNode = $xpath->query(".//div[contains(@class, 'business-review-view__body')]/span/span", $node)->item(0);
+    $reviewText = $reviewTextNode ? $reviewTextNode->textContent : 'Текст отсутствует';
+
+    $reviews[] = [
+        'author' => trim($author),
+        'date' => trim($date),
+        'rating' => (int)$rating,
+        'reviewText' => trim($reviewText)
+    ];
+}
+
 
     // Логирование JSON-данных перед отправкой
     $jsonReviews = json_encode($reviews);

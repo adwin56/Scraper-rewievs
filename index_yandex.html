@@ -114,9 +114,12 @@
         console.log('Страница загружена, начинаю fetch запрос');
 
         // Запрос к PHP-скрипту для получения отзывов
-        fetch('parse_reviews_yandex.php')
+                fetch('parse_reviews_yandex.php')
             .then(response => {
                 console.log('Ответ получен:', response);
+                if (!response.ok) {
+                    throw new Error('Ошибка сети');
+                }
                 return response.json();
             })
             .then(reviews => {
@@ -170,8 +173,8 @@
                 });
             })
             .catch(error => {
-                console.error('Ошибка при загрузке отзывов:', error);
-            });
+            console.error('Ошибка при загрузке отзывов:', error);
+             });
     </script>
 </body>
 </html>
