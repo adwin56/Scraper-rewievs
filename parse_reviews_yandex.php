@@ -45,7 +45,11 @@ try {
         ];
     }
 
-    echo json_encode($reviews);
+    // Логирование JSON-данных перед отправкой
+    $jsonReviews = json_encode($reviews);
+    error_log("Отправляемые данные JSON: " . $jsonReviews);
+
+    echo $jsonReviews;
 
 } catch (Exception $e) {
     // Логирование ошибки в лог сервера
