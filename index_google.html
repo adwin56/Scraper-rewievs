@@ -116,7 +116,7 @@
 
     <script>
         // Запрос к PHP-скрипту для получения отзывов
-        fetch('parse_reviews.php')
+        fetch('parse_reviews_google.php')
             .then(response => response.json())
             .then(reviews => {
                 if (reviews.error) {
