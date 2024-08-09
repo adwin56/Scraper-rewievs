@@ -32,26 +32,27 @@ try {
     }
 
     foreach ($reviewNodes as $node) {
-    $authorNode = $xpath->query(".//div[contains(@class, 'business-review-view__author-name')]/a/span", $node)->item(0);
-    $author = $authorNode ? $authorNode->textContent : 'Неизвестный автор';
+        $authorNode = $xpath->query(".//div[contains(@class, 'business-review-view__author-name')]/a/span", $node)->item(0);
+        $author = $authorNode ? $authorNode->textContent : 'Неизвестный автор';
 
-    $dateNode = $xpath->query(".//span[contains(@class, 'business-review-view__date')]", $node)->item(0);
-    $date = $dateNode ? $dateNode->textContent : 'Дата отсутствует';
+        $dateNode = $xpath->query(".//span[contains(@class, 'business-review-view__date')]", $node)->item(0);
+        $date = $dateNode ? $dateNode->textContent : 'Дата отсутствует';
 
-    $ratingNode = $xpath->query(".//div[contains(@class, 'business-review-view__rating')]/div/meta[@itemprop='ratingValue']", $node)->item(0);
-    $rating = $ratingNode ? (int)$ratingNode->getAttribute('content') : 'Без рейтинга';
+        // Подсчет количества звезд для получения рейтинга
+        $ratingStars = $xpath->query(".//div[contains(@class, 'business-rating-badge-view__stars')]/span[contains(@class, 'business-rating-badge-view__star')]", $node);
+        $rating = $ratingStars ? $ratingStars->length : 'Без рейтинга';
 
-    $reviewTextNode = $xpath->query(".//div[contains(@class, 'business-review-view__body-text')]/span/span", $node)->item(0);
-    $reviewText = $reviewTextNode ? $reviewTextNode->textContent : 'Текст отсутствует';
+        // Исправленный XPath для парсинга текста отзыва
+        $reviewTextNode = $xpath->query(".//div[contains(@class, 'spoiler-view__text')]//span[@class='business-review-view__body-text']", $node)->item(0);
+        $reviewText = $reviewTextNode ? $reviewTextNode->textContent : 'Текст отсутствует';
 
-    $reviews[] = [
-        'author' => trim($author),
-        'date' => trim($date),
-        'rating' => (int)$rating,
-        'reviewText' => trim($reviewText)
-    ];
-}
-
+        $reviews[] = [
+            'author' => trim($author),
+            'date' => trim($date),
+            'rating' => (int)$rating,
+            'reviewText' => trim($reviewText)
+        ];
+    }
 
     // Логирование JSON-данных перед отправкой
     $jsonReviews = json_encode($reviews);
