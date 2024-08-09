@@ -41,7 +41,7 @@ try {
     $ratingNode = $xpath->query(".//div[contains(@class, 'business-review-view__rating')]/div/meta[@itemprop='ratingValue']", $node)->item(0);
     $rating = $ratingNode ? (int)$ratingNode->getAttribute('content') : 'Без рейтинга';
 
-    $reviewTextNode = $xpath->query(".//div[contains(@class, 'business-review-view__body')]/span/span", $node)->item(0);
+    $reviewTextNode = $xpath->query(".//div[contains(@class, 'business-review-view__body-text')]/span/span", $node)->item(0);
     $reviewText = $reviewTextNode ? $reviewTextNode->textContent : 'Текст отсутствует';
 
     $reviews[] = [
