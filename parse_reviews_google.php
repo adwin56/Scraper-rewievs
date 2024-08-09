@@ -25,7 +25,7 @@ try {
 
     $reviews = [];
     // Обновленный XPath-запрос для поиска отзывов
-    $reviewNodes = $xpath->query("//div[contains(@class, 'jftiEf fontBodyMedium')]");
+    $reviewNodes = $xpath->query(".//div[contains(@class, 'jftiEf')]");
 
     $logs = [];
     $logs[] = 'HTML загружен успешно';
