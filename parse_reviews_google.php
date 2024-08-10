@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 
 try {
-    $url = 'https://www.google.ru/maps/place/Стоматологическая+клиника+Даймонд-Клиник+Горьковская+Ӏ+имплантация+зубов,+виниры/@56.3109185,43.99761,17z/data=!4m8!3m7!1s0x4151d5ed4c477dbb:0xa76f684cc157f9b7!8m2!3d56.3110243!4d44.0001199!9m1!1b1!16s%2Fg%2F11bzrhpp3j?entry=ttu'; // Ваша ссылка
+    $url = 'https://www.google.ru/maps/place/Стоматологическая+клиника+Даймонд-Клиника+Горьковская+Ӏ+имплантация+зубов,+виниры/@56.3109185,43.99761,17z/data=!4m8!3m7!1s0x4151d5ed4c477dbb:0xa76f684cc157f9b7!8m2!3d56.3110243!4d44.0001199!9m1!1b1!16s%2Fg%2F11bzrhpp3j?entry=ttu'; // Ваша ссылка
 
     // Использование cURL для загрузки страницы
     $ch = curl_init($url);
@@ -23,14 +23,14 @@ try {
     @$dom->loadHTML($html);
     $xpath = new DOMXPath($dom);
 
-    $reviews = [];
-    // Обновленный XPath-запрос для поиска отзывов
-    $reviewNodes = $xpath->query(".//div[contains(@class, 'jftiEf')]");
-
     $logs = [];
     $logs[] = 'HTML загружен успешно';
     $logs[] = 'HTML успешно загружен в DOMDocument';
     $logs[] = 'Объект DOMXPath успешно создан';
+
+    // Измените XPath-запрос для поиска элементов отзывов
+    $reviewNodes = $xpath->query('//*[contains(concat( " ", @class, " " ), concat( " ", "fontBodyMedium", " " ))]');
+1
 
     if ($reviewNodes === FALSE) {
         throw new Exception('Ошибка при парсинге: не удалось найти элементы отзывов');
@@ -38,6 +38,7 @@ try {
 
     $logs[] = 'Найдено ' . $reviewNodes->length . ' элементов отзывов';
 
+    $reviews = [];
     foreach ($reviewNodes as $node) {
         // Поиск элементов внутри отзыва
         $authorNode = $xpath->query(".//div[contains(@class, 'd4r55')]", $node)->item(0);
@@ -52,7 +53,7 @@ try {
         $rating = $ratingStars ? $ratingStars->length : 'Без рейтинга';
         $logs[] = 'Рейтинг: ' . $rating;
 
-        $reviewTextNode = $xpath->query(".//span[@class='wiI7pd']", $node)->item(0);
+        $reviewTextNode = $xpath->query(".//span[contains(@class, 'wiI7pd')]", $node)->item(0);
         $reviewText = $reviewTextNode ? $reviewTextNode->textContent : 'Текст отсутствует';
         $logs[] = 'Текст отзыва: ' . $reviewText;
 
@@ -68,5 +69,6 @@ try {
     echo $jsonReviews;
 
 } catch (Exception $e) {
+    $logs[] = 'Ошибка: ' . $e->getMessage();
     echo json_encode(['error' => $e->getMessage(), 'logs' => $logs]);
 }
