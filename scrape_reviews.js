@@ -15,7 +15,7 @@ const fs = require('fs');
         // Прокрутка страницы вниз
         previousHeight = await page.evaluate('document.body.scrollHeight');
         await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-        await page.waitForTimeout(2000); // ожидание загрузки новых отзывов
+        await new Promise(resolve => setTimeout(resolve, 2000)); // ожидание загрузки новых отзывов
 
         // Извлечение отзывов на текущей странице
         let newReviews = await page.evaluate(() => {
