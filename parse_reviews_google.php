@@ -29,7 +29,7 @@ try {
     $logs[] = 'Объект DOMXPath успешно создан';
 
     // Измените XPath-запрос для поиска элементов отзывов
-    $reviewNodes = $xpath->query('//*[contains(concat( " ", @class, " " ), concat( " ", "fontBodyMedium", " " ))]');
+    $reviewNodes = $xpath->query('//*[contains(concat( " ", @class, " " ), concat( " ", ".jftiEf.fontBodyMedium", " " ))]');
 
 
     if ($reviewNodes === FALSE) {
