@@ -4,15 +4,15 @@ const fs = require('fs');
 (async () => {
     try {
         console.log('Запуск браузера...');
-        const browser = await puppeteer.launch({ headless: true }); // запуск браузера в видимом режиме
+        const browser = await puppeteer.launch({ headless: false }); // запуск браузера в видимом режиме
         const page = await browser.newPage();
 
         // Переход на страницу с отзывами
         console.log('Переход на страницу с отзывами...');
-        await page.goto('https://www.google.ru/maps/place/Стоматологическая+клиника+Даймонд-Клиника+Горьковская+Ӏ+имплантация+зубов,+виниры/@56.3109185,43.99761,17z/data=!4m8!3m7!1s0x4151d5ed4c477dbb:0xa76f684cc157f9b7!8m2!3d56.3110243!4d44.0001199!9m1!1b1!16s%2Fg%2F11bzrhpp3j?entry=ttu', { waitUntil: 'networkidle2' });
+        await page.goto('https://yandex.ru/maps/org/daymond_klinik/164798670887/reviews/?indoorLevel=1&ll=49.123700%2C55.790012&z=16', { waitUntil: 'networkidle2' });
 
         // Ждем появления блока отзывов
-        const scrollableDivSelector = '.m6QErb.DxyBCb.kA9KIf.dS8AEf.XiKgde'; // Убедитесь, что этот селектор корректен
+        const scrollableDivSelector = '.business-review-view__info'; // Замените на корректный селектор вашего блока
         console.log('Ожидание появления блока отзывов...');
         await page.waitForSelector(scrollableDivSelector);
 
@@ -51,24 +51,24 @@ const fs = require('fs');
         console.log('Извлечение отзывов...');
         // Извлечение отзывов
         const reviews = await page.evaluate(() => {
-            const reviewNodes = document.querySelectorAll('.jftiEf.fontBodyMedium');
-
-            if (reviewNodes.length === 0) {
-                console.warn('Предупреждение: Отзывы не найдены!');
-            }
-
             const reviewsArray = [];
+            const reviewNodes = document.querySelectorAll('.business-review-view__info'); // Обновите селектор в зависимости от структуры HTML
+
             reviewNodes.forEach(node => {
-                const author = node.querySelector('.d4r55') ? node.querySelector('.d4r55').innerText : 'Неизвестный автор';
-                const rating = node.querySelector('.kvMYJc') ? node.querySelector('.kvMYJc').getAttribute('aria-label').split(' ')[0] : 'Без рейтинга';
-                const date = node.querySelector('.rsqaWe') ? node.querySelector('.rsqaWe').innerText : 'Дата отсутствует';
-                const text = node.querySelector('.wiI7pd') ? node.querySelector('.wiI7pd').innerText : 'Текст отсутствует';
+                const author = node.querySelector('.business-review-view__author-name') ? node.querySelector('.business-review-view__author-name').innerText : 'Неизвестный автор';
+                const date = node.querySelector('.business-review-view__date') ? node.querySelector('.business-review-view__date').innerText : 'Дата отсутствует';
+
+                // Подсчет количества звезд для получения рейтинга
+                const ratingStars = node.querySelectorAll('.business-rating-badge-view__star');
+                const rating = ratingStars.length || 'Без рейтинга';
+
+                const reviewText = node.querySelector('.business-review-view__body-text') ? node.querySelector('.business-review-view__body-text').innerText : 'Текст отсутствует';
 
                 reviewsArray.push({
                     author: author,
                     rating: rating,
                     date: date,
-                    text: text
+                    reviewText: reviewText
                 });
             });
 
@@ -78,7 +78,7 @@ const fs = require('fs');
 
         console.log('Сохранение отзывов в файл JSON...');
         // Сохранение отзывов в файл JSON
-        fs.writeFileSync('reviews.json', JSON.stringify(reviews, null, 2));
+        fs.writeFileSync('reviews2.json', JSON.stringify(reviews, null, 2));
 
         console.log('Отзывы сохранены в файл reviews.json');
 
