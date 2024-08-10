@@ -30,7 +30,7 @@ try {
 
     // Измените XPath-запрос для поиска элементов отзывов
     $reviewNodes = $xpath->query('//*[contains(concat( " ", @class, " " ), concat( " ", "fontBodyMedium", " " ))]');
-1
+
 
     if ($reviewNodes === FALSE) {
         throw new Exception('Ошибка при парсинге: не удалось найти элементы отзывов');
