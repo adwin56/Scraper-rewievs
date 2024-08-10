@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false }); // запуск браузера в видимом режиме
+    const browser = await puppeteer.launch({ headless: true }); // запуск браузера в скрытом режиме
     const page = await browser.newPage();
 
     // Переход на страницу с отзывами
@@ -15,7 +15,9 @@ const fs = require('fs');
         // Прокрутка страницы вниз
         previousHeight = await page.evaluate('document.body.scrollHeight');
         await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-        await new Promise(resolve => setTimeout(resolve, 2000)); // ожидание загрузки новых отзывов
+        
+        // Замена page.waitForTimeout на page.waitForFunction
+        await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
 
         // Извлечение отзывов на текущей странице
         let newReviews = await page.evaluate(() => {
