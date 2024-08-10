@@ -27,10 +27,10 @@ const fs = require('fs');
             }
 
             console.log('Блок найден. Начинается прокрутка...');
-            const scrollStep = 250;
+            const scrollStep = 500;
             let lastHeight = scrollableDiv.scrollHeight;
             let attempt = 0;
-            while (attempt < 10) { // Увеличено количество попыток
+            while (attempt < 20) { // Увеличено количество попыток
                 scrollableDiv.scrollTop = scrollableDiv.scrollHeight; // Прокрутка до низа
                 console.log(`Попытка ${attempt + 1}: высота до ${lastHeight}, высота после ${scrollableDiv.scrollHeight}`);
 
