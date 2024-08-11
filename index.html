@@ -5,314 +5,343 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отзывы компании</title>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
 
-.container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
 
-.summary {
-    margin-bottom: 20px;
-}
+        .summary {
+            margin-bottom: 20px;
+        }
 
-.summary-item {
-    margin-bottom: 10px;
-}
+        .summary-item {
+            margin-bottom: 10px;
+        }
 
-.rating-bar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-}
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
 
-.rating-bar span {
-    margin-right: 5px;
-    font-weight: bold;
-}
+        .rating-bar span {
+            margin-right: 5px;
+            font-weight: bold;
+        }
 
-.rating-bar div {
-    height: 20px;
-    width: 200px;
-    background: #ddd;
-    border-radius: 4px;
-    position: relative;
-}
+        .rating-bar div {
+            height: 20px;
+            width: 200px;
+            background: #ddd;
+            border-radius: 4px;
+            position: relative;
+        }
 
-.rating-bar div::after {
-    content: '';
-    display: block;
-    height: 100%;
-    background: #ffb81c;
-    border-radius: 4px;
-}
+        .rating-bar div::after {
+            content: '';
+            display: block;
+            height: 100%;
+            background: #ffb81c;
+            border-radius: 4px;
+        }
 
-.reviews-wrapper {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
+        .reviews-wrapper {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
 
-.reviews-container {
-    display: flex;
-    align-items: flex-start;
-    width: calc(100% - 50px); /* Уменьшаем ширину контейнера, чтобы оставить место для стрелок */
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 10px 0;
-    padding-left: 50px; /* Добавляем отступ слева для сдвига отзывов вправо */
-    white-space: nowrap;
-    scroll-behavior: smooth;
-    position: relative;
-}
+        .reviews-container {
+            display: flex;
+            align-items: flex-start;
+            width: calc(100% - 50px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0;
+            padding-left: 50px;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+            position: relative;
+        }
 
-.review {
-    box-sizing: border-box;
-    width: 300px;
-    margin-right: 15px;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    background: #fafafa;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    flex-shrink: 0;
-}
+        .review {
+            box-sizing: border-box;
+            width: 300px;
+            margin-right: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background: #fafafa;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            flex-shrink: 0;
+            height: 150px; /* Фиксированная высота для верхней части блока */
+            overflow: hidden; /* Скроет текст, если он выходит за пределы блока */
+        }
 
-.review:last-child {
-    margin-right: 0;
-}
+        .review-content {
+            overflow: auto; /* Добавляет прокрутку для длинного текста */
+            height: 100%;
+        }
 
-.review-author {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
+        .review-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-.review-date {
-    font-size: 0.9em;
-    color: #888;
-    margin-bottom: 5px;
-}
+        .review-date {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
 
-.review-rating {
-    margin-bottom: 5px;
-}
+        .review-rating {
+            margin-bottom: 5px;
+        }
 
-.review-text {
-    margin-top: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-    word-wrap: break-word;
-}
+        .review-platform {
+            font-size: 0.9em;
+            color: #333;
+            margin-bottom: 5px;
+        }
 
-.review-response {
-    font-style: italic;
-    color: #666;
-}
+        .review-platform a {
+            color: #007bff;
+            text-decoration: none;
+        }
 
-.load-more {
-    display: block;
-    margin: 20px 0;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-}
+        .review-platform a:hover {
+            text-decoration: underline;
+        }
 
-.load-more:hover {
-    background-color: #0056b3;
-}
+        .review-text {
+            margin-top: 10px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
 
-.pagination {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    pointer-events: none;
-    z-index: 1;
-}
+        .review-response {
+            font-style: italic;
+            color: #666;
+        }
 
-.pagination button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #007bff;
-    pointer-events: auto;
-}
+        .load-more {
+            display: block;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
 
-.pagination button:hover {
-    color: #0056b3;
-}
+        .load-more:hover {
+            background-color: #0056b3;
+        }
 
-.pagination-left {
-    position: absolute;
-    left: 10px;
-}
+        .pagination {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-.pagination-right {
-    position: absolute;
-    right: 10px;
-}
+        .pagination button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #007bff;
+            pointer-events: auto;
+        }
 
+        .pagination button:hover {
+            color: #0056b3;
+        }
+
+        .pagination-left {
+            position: absolute;
+            left: 10px;
+        }
+
+        .pagination-right {
+            position: absolute;
+            right: 10px;
+        }
+
+        .page-indicators {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .page-indicators span {
+            height: 8px;
+            width: 8px;
+            background-color: #007bff;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+        }
+
+        .page-indicators .active {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="summary">
-            <div class="summary-item" id="average-rating">Средний рейтинг: 0</div>
-            <div class="summary-item">
-                <div class="rating-bar">
-                    <span>5 звёзд:</span>
-                    <div id="rating-5" style="width: 0;"></div>
-                </div>
-                <div class="rating-bar">
-                    <span>4 звезды:</span>
-                    <div id="rating-4" style="width: 0;"></div>
-                </div>
-                <div class="rating-bar">
-                    <span>3 звезды:</span>
-                    <div id="rating-3" style="width: 0;"></div>
-                </div>
-                <div class="rating-bar">
-                    <span>2 звезды:</span>
-                    <div id="rating-2" style="width: 0;"></div>
-                </div>
-                <div class="rating-bar">
-                    <span>1 звезда:</span>
-                    <div id="rating-1" style="width: 0;"></div>
-                </div>
-            </div>
+            <div class="summary-item" id="average-rating">Средний рейтинг:</div>
         </div>
         <div class="reviews-wrapper">
             <div class="pagination pagination-left">
-                <button id="prev-page">&#9664;</button> <!-- Стрелочка влево -->
+                <button id="prev-page">&#9664;</button>
             </div>
             <div class="reviews-container" id="reviews-container">
                 <!-- Отзывы будут загружены сюда -->
             </div>
             <div class="pagination pagination-right">
-                <button id="next-page">&#9654;</button> <!-- Стрелочка вправо -->
+                <button id="next-page">&#9654;</button>
             </div>
         </div>
-        <a href="https://your-link-to-external-reviews-page.com" class="load-more" id="load-more">Перейти на страницу отзывов</a>
+        <div class="page-indicators" id="page-indicators"></div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const reviewsContainer = document.getElementById('reviews-container');
-            const prevPageButton = document.getElementById('prev-page');
-            const nextPageButton = document.getElementById('next-page');
-            let reviews = [];
-            let currentPage = 1;
-            const reviewsPerPage = 3;
+document.addEventListener('DOMContentLoaded', function () {
+    const reviewsContainer = document.getElementById('reviews-container');
+    const prevPageButton = document.getElementById('prev-page');
+    const nextPageButton = document.getElementById('next-page');
+    const pageIndicators = document.getElementById('page-indicators');
+    let reviews = [];
+    let currentPage = 1;
+    const reviewsPerPage = 3;
+    let totalPages = 1;
 
-            function loadReviews() {
-                fetch('fetch_reviews.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Ошибка при загрузке отзывов:', data.error);
-                        return;
-                    }
-                    reviews = data;
-                    displayReviews();
-                    updateSummary();
-                })
-                .catch(error => {
-                    console.error('Ошибка при загрузке данных:', error);
-                });
-            }
-            
-            function displayReviews() {
-                reviewsContainer.innerHTML = '';
-
-                const start = (currentPage - 1) * reviewsPerPage;
-                const end = start + reviewsPerPage;
-                const paginatedReviews = reviews.slice(start, end);
-
-                paginatedReviews.forEach(review => {
-                    const reviewElement = document.createElement('div');
-                    reviewElement.classList.add('review');
-                    
-                    reviewElement.innerHTML = `
-                        <div class="review-author">${review.author}</div>
-                        <div class="review-date">${review.date}</div>
-                        <div class="review-rating">Рейтинг: ${review.rating}</div>
-                        <div class="review-text">${review.text}</div>
-                    `;
-                    
-                    reviewsContainer.appendChild(reviewElement);
-                });
-
-                updatePaginationButtons();
+    function loadReviews() {
+        fetch('fetch_reviews.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Ошибка при загрузке отзывов:', data.error);
+                return;
             }
 
-            function updateSummary() {
-                const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-                let totalRating = 0;
-                
-                reviews.forEach(review => {
-                    const rating = parseInt(review.rating);
-                    if (rating >= 1 && rating <= 5) {
-                        ratingCounts[rating]++;
-                        totalRating += rating;
-                    }
-                });
-                
-                const totalReviews = reviews.length;
-                const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : 0;
-                document.getElementById('average-rating').textContent = `Средний рейтинг: ${averageRating}`;
-                
-                for (let i = 1; i <= 5; i++) {
-                    const ratingBar = document.getElementById(`rating-${i}`);
-                    const percentage = (ratingCounts[i] / totalReviews) * 100;
-                    ratingBar.style.width = `${percentage}%`;
-                }
-            }
-            
-            function updatePaginationButtons() {
-                const totalPages = Math.ceil(reviews.length / reviewsPerPage);
-                prevPageButton.disabled = currentPage === 1;
-                nextPageButton.disabled = currentPage === totalPages;
-            }
-            
-            prevPageButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayReviews();
-                }
-            });
-            
-            nextPageButton.addEventListener('click', () => {
-                const totalPages = Math.ceil(reviews.length / reviewsPerPage);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayReviews();
-                }
-            });
-            
-            loadReviews();
+            // Объединяем данные из обоих источников
+            reviews = [...data.yandexReviews, ...data['2gisReviews']]; // Объединяем массивы отзывов
+
+            // Обновляем количество страниц
+            totalPages = Math.ceil(reviews.length / reviewsPerPage);
+
+            // Отображаем отзывы и обновляем UI
+            displayReviews();
+            updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
+            updatePageIndicators();
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке данных:', error);
         });
+    }
+    
+    function displayReviews() {
+        reviewsContainer.innerHTML = '';
+
+        const sortedReviews = [...reviews].sort((a, b) => {
+            return b.rating - a.rating; // Сортируем отзывы по рейтингу в порядке убывания
+        });
+
+        const start = (currentPage - 1) * reviewsPerPage;
+        const end = start + reviewsPerPage;
+        const paginatedReviews = sortedReviews.slice(start, end);
+
+        paginatedReviews.forEach(review => {
+            const reviewElement = document.createElement('div');
+            reviewElement.classList.add('review');
+            
+            reviewElement.innerHTML = `
+                <div class="review-content">
+                    <div class="review-author">${review.author}</div>
+                    <div class="review-date">${review.date}</div>
+                    <div class="review-rating">Рейтинг: ${review.rating}</div>
+                    <div class="review-platform">
+                        Платформа: <a href="${review.platformUrl}">${review.platform}</a>
+                    </div>
+                    <div class="review-text">${review.reviewText}</div>
+                </div>
+            `;
+            
+            reviewsContainer.appendChild(reviewElement);
+        });
+
+        updatePaginationButtons();
+    }
+
+    function updateSummary(googleRating, yandexRating, twoGisRating) {
+        const summaryElement = document.getElementById('average-rating');
+        summaryElement.innerHTML = `
+            Средний рейтинг: <br>
+            Google Maps: ${googleRating} <br>
+            Яндекс Карты: ${yandexRating} <br>
+            2ГИС: ${twoGisRating}
+        `;
+    }
+
+    function updatePageIndicators() {
+        pageIndicators.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const indicator = document.createElement('span');
+            indicator.classList.add('page-indicator');
+            if (i === currentPage) {
+                indicator.classList.add('active');
+            }
+            pageIndicators.appendChild(indicator);
+        }
+    }
+
+    function updatePaginationButtons() {
+        prevPageButton.disabled = currentPage === 1;
+        nextPageButton.disabled = currentPage === totalPages;
+    }
+
+    prevPageButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displayReviews();
+        }
+    });
+
+    nextPageButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayReviews();
+        }
+    });
+
+    loadReviews();
+});
+
     </script>
 </body>
 </html>
