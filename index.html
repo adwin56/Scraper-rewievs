@@ -106,8 +106,18 @@
             height: 50px;
             border-radius: 50%;
             margin-bottom: 10px;
-            object-fit: cover;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            background-size: cover;
+            background-position: center;
         }
+
 
         .review-author {
             font-weight: bold;
@@ -238,7 +248,7 @@
         <div class="page-indicators" id="page-indicators"></div>
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const reviewsContainer = document.getElementById('reviews-container');
     const prevPageButton = document.getElementById('prev-page');
     const nextPageButton = document.getElementById('next-page');
@@ -250,46 +260,60 @@
 
     function loadReviews() {
         fetch('fetch_reviews.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error('Ошибка при загрузке отзывов:', data.error);
-                return;
-            }
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Ошибка при загрузке отзывов:', data.error);
+                    reviewsContainer.innerHTML = '<p>Не удалось загрузить отзывы.</p>';
+                    return;
+                }
 
-            // Объединяем данные из обоих источников
-            reviews = [...data.yandexReviews, ...data['2gisReviews']]; // Объединяем массивы отзывов
+                reviews = [...data.yandexReviews, ...data['2gisReviews']]; // Объединяем массивы отзывов
 
-            // Обновляем количество страниц
-            totalPages = Math.ceil(reviews.length / reviewsPerPage);
+                totalPages = Math.ceil(reviews.length / reviewsPerPage);
 
-            // Отображаем отзывы и обновляем UI
-            displayReviews();
-            updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
-            updatePageIndicators();
-        })
-        .catch(error => {
-            console.error('Ошибка при загрузке данных:', error);
-        });
+                displayReviews();
+                updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
+                updatePageIndicators();
+            })
+            .catch(error => {
+                console.error('Ошибка при загрузке данных:', error);
+                reviewsContainer.innerHTML = '<p>Произошла ошибка при загрузке данных.</p>';
+            });
     }
 
     function displayReviews() {
         reviewsContainer.innerHTML = '';
 
-        const sortedReviews = [...reviews].sort((a, b) => {
-            return b.rating - a.rating; // Сортируем отзывы по рейтингу в порядке убывания
-        });
+        if (reviews.length === 0) {
+            reviewsContainer.innerHTML = '<p>Нет доступных отзывов.</p>';
+            return;
+        }
+
+        const sortedReviews = [...reviews].sort((a, b) => b.rating - a.rating);
 
         const start = (currentPage - 1) * reviewsPerPage;
         const end = start + reviewsPerPage;
         const paginatedReviews = sortedReviews.slice(start, end);
 
         paginatedReviews.forEach(review => {
+            const cleanAvatarUrl = review.avatarUrl ? review.avatarUrl.replace(/^\/+|\/+$/g, '') : '';
             const reviewElement = document.createElement('div');
             reviewElement.classList.add('review');
-            
+
+            const avatarElement = document.createElement('div');
+            avatarElement.classList.add('review-avatar');
+
+            if (cleanAvatarUrl) {
+                // Задаем URL для фонового изображения
+                avatarElement.style.backgroundImage = `url(${cleanAvatarUrl})`;
+            } else {
+                // Если URL нет, показываем первую букву автора
+                avatarElement.textContent = review.author.charAt(0);
+            }
+
             reviewElement.innerHTML = `
-                <img src="${review.avatarUrl}" alt="Avatar" class="review-avatar"> <!-- Добавляем аватарку -->
+                ${avatarElement.outerHTML}
                 <div class="review-content">
                     <div class="review-author">${review.author}</div>
                     <div class="review-date">${review.date}</div>
@@ -300,7 +324,7 @@
                     <div class="review-text">${review.reviewText}</div>
                 </div>
             `;
-            
+
             reviewsContainer.appendChild(reviewElement);
         });
 
@@ -309,11 +333,10 @@
 
     function updateSummary(googleRating, yandexRating, twoGisRating) {
         const summaryElement = document.getElementById('average-rating');
-        
-        // Расчет общего среднего рейтинга
+
         const ratings = [googleRating, yandexRating, twoGisRating].filter(r => r !== null && r !== undefined);
         const averageRating = ratings.reduce((acc, rating) => acc + parseFloat(rating), 0) / ratings.length;
-        
+
         summaryElement.innerHTML = `
             Средний рейтинг: ${averageRating.toFixed(1)} <br>
             Google Maps: ${googleRating} <br>
@@ -355,6 +378,8 @@
 
     loadReviews();
 });
-    </script>
+
+
+    </script> 
 </body>
 </html>

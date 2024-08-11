@@ -49,24 +49,26 @@ try {
     // Приводим данные к единообразному виду
     $yandexReviews = array_map(function($review) use ($platformLinks) {
         $platform = $review['platform'] ?? 'Неизвестно';
+        $avatarUrl = trim($review['avatarUrl'], '\"/');
         return [
             'author' => $review['author'] ?? 'Неизвестный автор',
             'date' => $review['date'] ?? 'Дата отсутствует',
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['text'] ?? 'Текст отсутствует',
-            'avatarUrl' => $review['avatarUrl'] ?? 'Аватар отсутствует',  // Добавляем поле avatarUrl
+            'avatarUrl' => $avatarUrl,
             'platform' => $platform,
             'platformUrl' => $platformLinks[$platform] ?? 'Неизвестная платформа'
         ];
     }, $dataYandex['reviews'] ?? []);
     
     $twoGISReviews = array_map(function($review) use ($platformLinks) {
+        $avatarUrl = trim($review['avatarUrl'], '\"/');
         return [
             'author' => $review['author'] ?? 'Неизвестный автор',
             'date' => $review['date'] ?? 'Дата отсутствует',
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['reviewText'] ?? 'Текст отсутствует',
-            'avatarUrl' => $review['avatarUrl'] ?? 'Аватар отсутствует',  // Добавляем поле avatarUrl
+            'avatarUrl' => $avatarUrl,
             'platform' => '2ГИС',
             'platformUrl' => $platformLinks['2ГИС']
         ];
