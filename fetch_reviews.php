@@ -54,6 +54,7 @@ try {
             'date' => $review['date'] ?? 'Дата отсутствует',
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['text'] ?? 'Текст отсутствует',
+            'avatarUrl' => $review['avatarUrl'] ?? 'Аватар отсутствует',  // Добавляем поле avatarUrl
             'platform' => $platform,
             'platformUrl' => $platformLinks[$platform] ?? 'Неизвестная платформа'
         ];
@@ -65,6 +66,7 @@ try {
             'date' => $review['date'] ?? 'Дата отсутствует',
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['reviewText'] ?? 'Текст отсутствует',
+            'avatarUrl' => $review['avatarUrl'] ?? 'Аватар отсутствует',  // Добавляем поле avatarUrl
             'platform' => '2ГИС',
             'platformUrl' => $platformLinks['2ГИС']
         ];

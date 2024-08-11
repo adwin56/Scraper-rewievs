@@ -92,13 +92,21 @@
             flex-direction: column;
             justify-content: flex-start;
             flex-shrink: 0;
-            height: 300px; /* Фиксированная высота для верхней части блока */
-            overflow: hidden; /* Скроет текст, если он выходит за пределы блока */
+            height: 350px; /* Увеличиваем высоту для размещения аватарки */
+            overflow: hidden;
         }
 
         .review-content {
-            overflow: auto; /* Добавляет прокрутку для длинного текста */
+            overflow: auto;
             height: 100%;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
         }
 
         .review-author {
@@ -281,6 +289,7 @@
             reviewElement.classList.add('review');
             
             reviewElement.innerHTML = `
+                <img src="${review.avatarUrl}" alt="Avatar" class="review-avatar"> <!-- Добавляем аватарку -->
                 <div class="review-content">
                     <div class="review-author">${review.author}</div>
                     <div class="review-date">${review.date}</div>
