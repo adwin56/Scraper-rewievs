@@ -4,7 +4,7 @@ const fs = require('fs');
 (async () => {
     try {
         console.log('Запуск браузера...');
-        const browser = await puppeteer.launch({ headless: false }); // Запуск браузера в видимом режиме
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
 
         // Переход на страницу с отзывами
@@ -12,41 +12,9 @@ const fs = require('fs');
         await page.goto('https://2gis.ru/n_novgorod/inside/2674647933966364/firm/70000001021080960/tab/reviews?m=43.999939%2C56.311007%2F16%2Fp%2F0.3', { waitUntil: 'networkidle2' });
 
         // Ждем появления блока отзывов
-        const scrollableDivSelector = '._jcreqo'; // Убедитесь, что этот селектор корректен
+        const reviewBlockSelector = '._11gvyqv'; // Убедитесь, что этот селектор корректен
         console.log('Ожидание появления блока отзывов...');
-        await page.waitForSelector(scrollableDivSelector);
-
-        console.log('Проверка и прокрутка блока...');
-        // Прокрутка блока для загрузки всех отзывов
-        await page.evaluate(async (selector) => {
-            const scrollableDiv = document.querySelector(selector);
-
-            if (!scrollableDiv) {
-                console.error('Ошибка: прокручиваемый блок не найден!');
-                return;
-            }
-
-            console.log('Блок найден. Начинается прокрутка...');
-            const scrollStep = 500;
-            let lastHeight = scrollableDiv.scrollHeight;
-            let attempt = 0;
-            while (attempt < 20) { // Увеличено количество попыток
-                scrollableDiv.scrollTop = scrollableDiv.scrollHeight; // Прокрутка до низа
-                console.log(`Попытка ${attempt + 1}: высота до ${lastHeight}, высота после ${scrollableDiv.scrollHeight}`);
-
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Подождем 2 секунды, чтобы новые элементы загрузились
-
-                let newHeight = scrollableDiv.scrollHeight;
-                console.log(`Высота после ожидания ${newHeight}`);
-
-                if (newHeight === lastHeight) {
-                    console.log('Прокрутка завершена, новых отзывов не загружено.');
-                    break; // Выходим из цикла, если больше ничего не загрузилось
-                }
-                lastHeight = newHeight;
-                attempt++;
-            }
-        }, scrollableDivSelector);
+        await page.waitForSelector(reviewBlockSelector);
 
         console.log('Извлечение отзывов...');
         // Извлечение отзывов
