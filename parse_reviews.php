@@ -28,6 +28,22 @@ foreach ($reviewNodes as $node) {
     $date = $xpath->query(".//div[@class='_4mwq3d']", $node)->item(0)->textContent ?? 'Дата отсутствует';
     $rating = $xpath->query(".//div[@class='_1fkin5c']/span", $node)->length ?? 0;
     $reviewText = $xpath->query(".//a[@class='_ayej9u3']", $node)->item(0)->textContent ?? 'Текст отсутствует';
+    
+    // Парсинг аватарок
+    $avatarUrl = 'Аватар отсутствует'; // Значение по умолчанию
+    $avatarNodeImage = $xpath->query(".//div[contains(@class, '_1dk5lq4')]", $node)->item(0);
+    $avatarNodeText = $xpath->query(".//div[contains(@class, '_10v2ue3')]", $node)->item(0);
+    
+    if ($avatarNodeImage) {
+        // Если аватарка с фоновым изображением
+        $style = $avatarNodeImage->getAttribute('style');
+        if (preg_match('/background-image:url\(([^)]+)\)/', $style, $matches)) {
+            $avatarUrl = $matches[1];
+        }
+    } elseif ($avatarNodeText) {
+        // Если аватарка с текстом
+        $avatarUrl = $avatarNodeText->textContent;
+    }
 
     $totalRating += $rating;
     $reviewCount++;
@@ -37,6 +53,7 @@ foreach ($reviewNodes as $node) {
         'date' => trim($date),
         'rating' => $rating,
         'reviewText' => trim($reviewText),
+        'avatarUrl' => $avatarUrl,
         'platform' => '2ГИС' // Добавляем строку платформы
     ];
 }
