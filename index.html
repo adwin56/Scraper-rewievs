@@ -228,25 +228,6 @@
             right: 10px;
         }
 
-        .page-indicators {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .page-indicators span {
-            height: 8px;
-            width: 8px;
-            background-color: #007bff;
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 3px;
-        }
-
-        .page-indicators .active {
-            background-color: #0056b3;
-        }
-
         .pagination-dots {
             display: flex;
             justify-content: center;
@@ -388,6 +369,7 @@
                 });
         
                 updatePaginationButtons();
+                updatePaginationDots();
             }
         
             function updateSummary(googleRating, yandexRating, twoGisRating) {
@@ -415,7 +397,6 @@
                     dot.addEventListener('click', () => {
                         currentPage = i;
                         displayReviews();
-                        updatePaginationDots();
                     });
                     paginationDots.appendChild(dot);
                 }
@@ -485,6 +466,6 @@
         
             loadReviews();
         });
-            </script>
-        </body>
-        </html>
+    </script>
+</body>
+</html>
