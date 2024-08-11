@@ -39,24 +39,34 @@ try {
     error_log("Yandex Reviews: " . print_r($dataYandex, true));
     error_log("2GIS Data: " . print_r($data2GIS, true));
 
+    // Ссылки на платформы
+    $platformLinks = [
+        'Яндекс Карты' => 'https://yandex.ru/maps/org/daymond_klinik/164798670887/reviews/?indoorLevel=1&ll=49.123700%2C55.790012&z=16',
+        'Google Maps' => 'https://www.google.ru/maps/place/Стоматологическая+клиника+Даймонд-Клиника+Горьковская+Ӏ+имплантация+зубов,+виниры/@56.3109185,43.99761,17z/data=!4m8!3m7!1s0x4151d5ed4c477dbb:0xa76f684cc157f9b7!8m2!3d56.3110243!4d44.0001199!9m1!1b1!16s%2Fg%2F11bzrhpp3j?entry=ttu',
+        '2ГИС' => 'https://2gis.ru/n_novgorod/inside/2674647933966364/firm/70000001021080960/tab/reviews?m=43.999939%2C56.311007%2F16%2Fp%2F0.3'
+    ];
+
     // Приводим данные к единообразному виду
-    $yandexReviews = array_map(function($review) {
+    $yandexReviews = array_map(function($review) use ($platformLinks) {
+        $platform = $review['platform'] ?? 'Неизвестно';
         return [
             'author' => $review['author'] ?? 'Неизвестный автор',
             'date' => $review['date'] ?? 'Дата отсутствует',
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['text'] ?? 'Текст отсутствует',
-            'platform' => $review['platform'] ?? 'Неизвестно'
+            'platform' => $platform,
+            'platformUrl' => $platformLinks[$platform] ?? 'Неизвестная платформа'
         ];
     }, $dataYandex['reviews'] ?? []);
     
-    $twoGISReviews = array_map(function($review) {
+    $twoGISReviews = array_map(function($review) use ($platformLinks) {
         return [
             'author' => $review['author'] ?? 'Неизвестный автор',
             'date' => $review['date'] ?? 'Дата отсутствует',
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['reviewText'] ?? 'Текст отсутствует',
-            'platform' => $review['platform'] ?? 'Неизвестно'
+            'platform' => '2ГИС',
+            'platformUrl' => $platformLinks['2ГИС']
         ];
     }, $data2GIS['reviews'] ?? []);
 

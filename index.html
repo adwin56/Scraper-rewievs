@@ -92,7 +92,7 @@
             flex-direction: column;
             justify-content: flex-start;
             flex-shrink: 0;
-            height: 150px; /* Фиксированная высота для верхней части блока */
+            height: 300px; /* Фиксированная высота для верхней части блока */
             overflow: hidden; /* Скроет текст, если он выходит за пределы блока */
         }
 
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="review-date">${review.date}</div>
                     <div class="review-rating">Рейтинг: ${review.rating}</div>
                     <div class="review-platform">
-                        Платформа: <a href="${review.platformUrl}">${review.platform}</a>
+                        Платформа: <a href="${review.platformUrl}" target="_blank">${review.platform}</a>
                     </div>
                     <div class="review-text">${review.reviewText}</div>
                 </div>
@@ -341,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadReviews();
 });
-
     </script>
 </body>
 </html>
