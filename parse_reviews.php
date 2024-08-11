@@ -26,14 +26,14 @@ foreach ($reviewNodes as $node) {
     $date = $xpath->query(".//div[@class='_4mwq3d']", $node)->item(0)->textContent ?? 'Дата отсутствует';
     $rating = $xpath->query(".//div[@class='_1fkin5c']/span", $node)->length ?? 'Без рейтинга';
     $reviewText = $xpath->query(".//a[@class='_ayej9u3']", $node)->item(0)->textContent ?? 'Текст отсутствует';
-    $response = $xpath->query(".//div[@class='_j1il10']", $node)->item(0)->textContent ?? 'Без ответа';
+
 
     $reviews[] = [
         'author' => trim($author),
         'date' => trim($date),
         'rating' => $rating,
         'reviewText' => trim($reviewText),
-        'response' => trim($response)
+
     ];
 }
 

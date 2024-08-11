@@ -13,29 +13,47 @@
         }
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 20px auto;
             padding: 20px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Для стрелочек */
+        }
+        .reviews-wrapper {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding: 10px 0;
         }
         .reviews-container {
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 20px;
+            display: flex;
+            flex-wrap: nowrap;
+            width: max-content;
         }
         .review {
+            box-sizing: border-box;
+            width: 300px; /* Ширина отзыва */
+            height: 300px; /* Высота отзыва, чтобы сделать квадрат */
+            margin-right: 15px; /* Отступ между отзывами */
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background: #fafafa;
             padding: 15px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .review:last-child {
-            border-bottom: none;
+            margin-right: 0; /* Убираем отступ у последнего отзыва */
         }
         .review-author {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         .review-date {
             font-size: 0.9em;
@@ -46,6 +64,11 @@
         }
         .review-text {
             margin: 10px 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+           
         }
         .review-response {
             font-style: italic;
@@ -94,6 +117,26 @@
         .load-more:hover {
             background-color: #0056b3;
         }
+        .pagination {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none; /* Чтобы стрелочки не перекрывали содержимое */
+        }
+        .pagination button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #007bff;
+            pointer-events: auto; /* Чтобы стрелочки были кликабельны */
+        }
+        .pagination button:hover {
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -123,63 +166,71 @@
                 </div>
             </div>
         </div>
-        <div class="reviews-container" id="reviews-container">
-            <!-- Отзывы будут загружены сюда -->
+        <div class="reviews-wrapper">
+            <div class="reviews-container" id="reviews-container">
+                <!-- Отзывы будут загружены сюда -->
+            </div>
         </div>
-        <button class="load-more" id="load-more">Загрузить больше</button>
+        <div class="pagination">
+            <button id="prev-page">&#9664;</button> <!-- Стрелочка влево -->
+            <button id="next-page">&#9654;</button> <!-- Стрелочка вправо -->
+        </div>
+        <a href="https://your-link-to-external-reviews-page.com" class="load-more" id="load-more">Перейти на страницу отзывов</a>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const reviewsContainer = document.getElementById('reviews-container');
-            const loadMoreButton = document.getElementById('load-more');
+            const prevPageButton = document.getElementById('prev-page');
+            const nextPageButton = document.getElementById('next-page');
             let reviews = [];
             let currentPage = 1;
-            const reviewsPerPage = 10;
+            const reviewsPerPage = 3;
 
             function loadReviews() {
                 fetch('fetch_reviews.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            console.error('Ошибка при загрузке отзывов:', data.error);
-                            return;
-                        }
-                        reviews = data;
-                        displayReviews();
-                        updateSummary();
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при загрузке данных:', error);
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Ошибка при загрузке отзывов:', data.error);
+                        return;
+                    }
+                    reviews = data;
+                    displayReviews();
+                    updateSummary();
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке данных:', error);
+                });
             }
-
+            
             function displayReviews() {
                 reviewsContainer.innerHTML = '';
+
                 const start = (currentPage - 1) * reviewsPerPage;
                 const end = start + reviewsPerPage;
-                const reviewsToDisplay = reviews.slice(start, end);
+                const paginatedReviews = reviews.slice(start, end);
 
-                reviewsToDisplay.forEach(review => {
+                paginatedReviews.forEach(review => {
                     const reviewElement = document.createElement('div');
                     reviewElement.classList.add('review');
-
+                    
                     reviewElement.innerHTML = `
                         <div class="review-author">${review.author}</div>
                         <div class="review-date">${review.date}</div>
                         <div class="review-rating">Рейтинг: ${review.rating}</div>
-                        <div class="review-text">${review.reviewText}</div>
+                        <div class="review-text">${review.text}</div>
                     `;
-
+                    
                     reviewsContainer.appendChild(reviewElement);
                 });
 
-                loadMoreButton.style.display = end < reviews.length ? 'block' : 'none';
+                updatePaginationButtons();
             }
 
             function updateSummary() {
                 const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
                 let totalRating = 0;
-
+                
                 reviews.forEach(review => {
                     const rating = parseInt(review.rating);
                     if (rating >= 1 && rating <= 5) {
@@ -187,23 +238,39 @@
                         totalRating += rating;
                     }
                 });
-
+                
                 const totalReviews = reviews.length;
                 const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : 0;
                 document.getElementById('average-rating').textContent = `Средний рейтинг: ${averageRating}`;
-
+                
                 for (let i = 1; i <= 5; i++) {
                     const ratingBar = document.getElementById(`rating-${i}`);
                     const percentage = (ratingCounts[i] / totalReviews) * 100;
                     ratingBar.style.width = `${percentage}%`;
                 }
             }
-
-            loadMoreButton.addEventListener('click', () => {
-                currentPage++;
-                displayReviews();
+            
+            function updatePaginationButtons() {
+                const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+                prevPageButton.disabled = currentPage === 1;
+                nextPageButton.disabled = currentPage === totalPages;
+            }
+            
+            prevPageButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayReviews();
+                }
             });
-
+            
+            nextPageButton.addEventListener('click', () => {
+                const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayReviews();
+                }
+            });
+            
             loadReviews();
         });
     </script>
