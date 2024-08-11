@@ -37,38 +37,38 @@
         }
         .review {
             box-sizing: border-box;
-            width: 300px; /* Ширина отзыва */
-            height: 300px; /* Высота отзыва, чтобы сделать квадрат */
+            width: 300px; /* Фиксированная ширина отзыва */
             margin-right: 15px; /* Отступ между отзывами */
             border: 1px solid #eee;
             border-radius: 5px;
             background: #fafafa;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
+            height: auto; /* Высота автоматически расширяется */
         }
         .review:last-child {
             margin-right: 0; /* Убираем отступ у последнего отзыва */
         }
         .review-author {
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 5px; /* Уменьшен отступ */
         }
         .review-date {
             font-size: 0.9em;
             color: #888;
+            margin-bottom: 5px; /* Уменьшен отступ */
         }
         .review-rating {
-            margin: 5px 0;
+            margin-bottom: 5px; /* Уменьшен отступ */
         }
         .review-text {
-            margin: 10px 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-           
+            margin-top: 10px; /* Отступ от других элементов */
+            overflow: hidden; /* Скроем переполнение по горизонтали */
+            text-overflow: ellipsis; /* Обрезаем текст с троеточием, если не помещается */
+            white-space: normal; /* Разрешаем перенос текста на новую строку */
+            word-wrap: break-word; /* Переносим длинные слова */
         }
         .review-response {
             font-style: italic;
