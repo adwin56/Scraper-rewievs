@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отзывы компании</title>
     <style>
-        /* Ваши стили */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -127,53 +126,85 @@
         <div class="reviews-container" id="reviews-container">
             <!-- Отзывы будут загружены сюда -->
         </div>
-        <button class="load-more" id="load-more">Больше отзывов</button>
+        <button class="load-more" id="load-more">Загрузить больше</button>
     </div>
-
     <script>
-        document.getElementById('load-more').addEventListener('click', () => {
-            fetch('./fetch_reviews.php')
-                .then(response => response.json())
-                .then(data => {
-                    const reviewsContainer = document.getElementById('reviews-container');
-                    const ratingCounts = [0, 0, 0, 0, 0]; // Счетчики для рейтингов от 1 до 5
-                    let totalRating = 0;
-                    let reviewCount = 0;
+        document.addEventListener('DOMContentLoaded', function () {
+            const reviewsContainer = document.getElementById('reviews-container');
+            const loadMoreButton = document.getElementById('load-more');
+            let reviews = [];
+            let currentPage = 1;
+            const reviewsPerPage = 10;
 
-                    data.forEach(review => {
-                        const reviewElement = document.createElement('div');
-                        reviewElement.classList.add('review');
-                        reviewElement.innerHTML = `
-                            <div class="review-author">${review.author}</div>
-                            <div class="review-date">${review.date}</div>
-                            <div class="review-rating">${'⭐'.repeat(review.rating)}</div>
-                            <div class="review-text">${review.reviewText}</div>
-                        `;
-                        reviewsContainer.appendChild(reviewElement);
-
-                        // Подсчет рейтингов
-                        const rating = parseInt(review.rating, 10);
-                        if (rating >= 1 && rating <= 5) {
-                            ratingCounts[rating - 1]++;
-                            totalRating += rating;
-                            reviewCount++;
+            function loadReviews() {
+                fetch('fetch_reviews.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Ошибка при загрузке отзывов:', data.error);
+                            return;
                         }
+                        reviews = data;
+                        displayReviews();
+                        updateSummary();
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при загрузке данных:', error);
                     });
+            }
 
-                    // Вычисление среднего рейтинга
-                    const averageRating = reviewCount > 0 ? (totalRating / reviewCount).toFixed(1) : 0;
-                    document.getElementById('average-rating').textContent = `Средний рейтинг: ${averageRating}⭐`;
+            function displayReviews() {
+                reviewsContainer.innerHTML = '';
+                const start = (currentPage - 1) * reviewsPerPage;
+                const end = start + reviewsPerPage;
+                const reviewsToDisplay = reviews.slice(start, end);
 
-                    // Обновление отображения распределения оценок
-                    ratingCounts.forEach((count, index) => {
-                        const ratingBar = document.getElementById(`rating-${5 - index}`);
-                        const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
-                        ratingBar.style.width = `${percentage}%`;
-                    });
-                })
-                .catch(error => {
-                    console.error('Ошибка при загрузке отзывов:', error);
+                reviewsToDisplay.forEach(review => {
+                    const reviewElement = document.createElement('div');
+                    reviewElement.classList.add('review');
+
+                    reviewElement.innerHTML = `
+                        <div class="review-author">${review.author}</div>
+                        <div class="review-date">${review.date}</div>
+                        <div class="review-rating">Рейтинг: ${review.rating}</div>
+                        <div class="review-text">${review.reviewText}</div>
+                    `;
+
+                    reviewsContainer.appendChild(reviewElement);
                 });
+
+                loadMoreButton.style.display = end < reviews.length ? 'block' : 'none';
+            }
+
+            function updateSummary() {
+                const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                let totalRating = 0;
+
+                reviews.forEach(review => {
+                    const rating = parseInt(review.rating);
+                    if (rating >= 1 && rating <= 5) {
+                        ratingCounts[rating]++;
+                        totalRating += rating;
+                    }
+                });
+
+                const totalReviews = reviews.length;
+                const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : 0;
+                document.getElementById('average-rating').textContent = `Средний рейтинг: ${averageRating}`;
+
+                for (let i = 1; i <= 5; i++) {
+                    const ratingBar = document.getElementById(`rating-${i}`);
+                    const percentage = (ratingCounts[i] / totalReviews) * 100;
+                    ratingBar.style.width = `${percentage}%`;
+                }
+            }
+
+            loadMoreButton.addEventListener('click', () => {
+                currentPage++;
+                displayReviews();
+            });
+
+            loadReviews();
         });
     </script>
 </body>
