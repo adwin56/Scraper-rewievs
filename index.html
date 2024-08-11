@@ -246,6 +246,30 @@
         .page-indicators .active {
             background-color: #0056b3;
         }
+
+        .pagination-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .pagination-dots .dot {
+            height: 10px;
+            width: 10px;
+            background-color: #007bff;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            cursor: pointer;
+        }
+
+        .pagination-dots .dot.active {
+            background-color: #0056b3;
+        }
+
+        .pagination-dots .dot.current {
+            background-color: #ff5722;
+        }
     </style>
 </head>
 <body>
@@ -270,194 +294,197 @@
                 <button id="next-page">&#9654;</button>
             </div>
         </div>
-        <div class="page-indicators" id="page-indicators"></div>
+        <div class="pagination-dots" id="pagination-dots"></div>
     </div>
     <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const reviewsContainer = document.getElementById('reviews-container');
-    const prevPageButton = document.getElementById('prev-page');
-    const nextPageButton = document.getElementById('next-page');
-    const pageIndicators = document.getElementById('page-indicators');
-    const showAllButton = document.getElementById('show-all');
-    const showGoogleButton = document.getElementById('show-google');
-    const showYandexButton = document.getElementById('show-yandex');
-    const show2gisButton = document.getElementById('show-2gis');
-    let allReviews = { google: [], yandex: [], '2gis': [] };
-    let filteredReviews = [];
-    let currentPage = 1;
-    const reviewsPerPage = 3;
-    let totalPages = 1;
-    let currentPlatform = 'all';
-
-    function loadReviews() {
-    fetch('fetch_reviews.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error('Ошибка при загрузке отзывов:', data.error);
-                reviewsContainer.innerHTML = '<p>Не удалось загрузить отзывы.</p>';
-                return;
+        document.addEventListener('DOMContentLoaded', function () {
+            const reviewsContainer = document.getElementById('reviews-container');
+            const prevPageButton = document.getElementById('prev-page');
+            const nextPageButton = document.getElementById('next-page');
+            const paginationDots = document.getElementById('pagination-dots');
+            const showAllButton = document.getElementById('show-all');
+            const showGoogleButton = document.getElementById('show-google');
+            const showYandexButton = document.getElementById('show-yandex');
+            const show2gisButton = document.getElementById('show-2gis');
+            let allReviews = { google: [], yandex: [], '2gis': [] };
+            let filteredReviews = [];
+            let currentPage = 1;
+            const reviewsPerPage = 3;
+            let totalPages = 1;
+            let currentPlatform = 'all';
+        
+            function loadReviews() {
+                fetch('fetch_reviews.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Ошибка при загрузке отзывов:', data.error);
+                            reviewsContainer.innerHTML = '<p>Не удалось загрузить отзывы.</p>';
+                            return;
+                        }
+        
+                        // Преобразование yandexReviews в массив, если это объект
+                        const yandexReviews = Array.isArray(data.yandexReviews) ? data.yandexReviews : Object.values(data.yandexReviews || {});
+                        
+                        allReviews.google = Array.isArray(data.googleReviews) ? data.googleReviews.slice(0, 6) : [];
+                        allReviews.yandex = yandexReviews.slice(0, 6);
+                        allReviews['2gis'] = Array.isArray(data['2gisReviews']) ? data['2gisReviews'].slice(0, 6) : [];
+        
+                        filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
+                        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        
+                        displayReviews();
+                        updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
+                        updatePaginationDots();
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при загрузке данных:', error);
+                        reviewsContainer.innerHTML = '<p>Произошла ошибка при загрузке данных.</p>';
+                    });
             }
-
-            // Преобразование yandexReviews в массив, если это объект
-            const yandexReviews = Array.isArray(data.yandexReviews) ? data.yandexReviews : Object.values(data.yandexReviews || {});
-            
-            allReviews.google = Array.isArray(data.googleReviews) ? data.googleReviews.slice(0, 6) : [];
-            allReviews.yandex = yandexReviews.slice(0, 6);
-            allReviews['2gis'] = Array.isArray(data['2gisReviews']) ? data['2gisReviews'].slice(0, 6) : [];
-
-            filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
-            totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-
-            displayReviews();
-            updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
-            updatePageIndicators();
-        })
-        .catch(error => {
-            console.error('Ошибка при загрузке данных:', error);
-            reviewsContainer.innerHTML = '<p>Произошла ошибка при загрузке данных.</p>';
+        
+            function displayReviews() {
+                reviewsContainer.innerHTML = '';
+        
+                if (filteredReviews.length === 0) {
+                    reviewsContainer.innerHTML = '<p>Нет доступных отзывов.</p>';
+                    return;
+                }
+        
+                const sortedReviews = [...filteredReviews].sort((a, b) => b.rating - a.rating);
+        
+                const start = (currentPage - 1) * reviewsPerPage;
+                const end = start + reviewsPerPage;
+                const paginatedReviews = sortedReviews.slice(start, end);
+        
+                paginatedReviews.forEach(review => {
+                    const cleanAvatarUrl = review.avatarUrl ? review.avatarUrl.replace(/^\/+|\/+$/g, '') : '';
+                    const reviewElement = document.createElement('div');
+                    reviewElement.classList.add('review');
+        
+                    const avatarElement = document.createElement('div');
+                    avatarElement.classList.add('review-avatar');
+        
+                    if (cleanAvatarUrl) {
+                        avatarElement.style.backgroundImage = `url(${cleanAvatarUrl})`;
+                    } else {
+                        avatarElement.textContent = review.author.charAt(0);
+                    }
+        
+                    reviewElement.innerHTML = `
+                        ${avatarElement.outerHTML}
+                        <div class="review-content">
+                            <div class="review-author">${review.author}</div>
+                            <div class="review-date">${review.date}</div>
+                            <div class="review-rating">Рейтинг: ${review.rating}</div>
+                            <div class="review-platform">
+                                Платформа: <a href="${review.platformUrl}" target="_blank">${review.platform}</a>
+                            </div>
+                            <div class="review-text">${review.reviewText}</div>
+                        </div>
+                    `;
+        
+                    reviewsContainer.appendChild(reviewElement);
+                });
+        
+                updatePaginationButtons();
+            }
+        
+            function updateSummary(googleRating, yandexRating, twoGisRating) {
+                const summaryElement = document.getElementById('average-rating');
+        
+                const ratings = [googleRating, yandexRating, twoGisRating].filter(r => r !== null && r !== undefined);
+                const averageRating = ratings.reduce((acc, rating) => acc + parseFloat(rating), 0) / ratings.length;
+        
+                summaryElement.innerHTML = `
+                    Средний рейтинг: ${averageRating.toFixed(1)} <br>
+                    Google Maps: ${googleRating} <br>
+                    Яндекс Карты: ${yandexRating} <br>
+                    2ГИС: ${twoGisRating}
+                `;
+            }
+        
+            function updatePaginationDots() {
+                paginationDots.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    if (i === currentPage) {
+                        dot.classList.add('current');
+                    }
+                    dot.addEventListener('click', () => {
+                        currentPage = i;
+                        displayReviews();
+                        updatePaginationDots();
+                    });
+                    paginationDots.appendChild(dot);
+                }
+            }
+        
+            function updatePaginationButtons() {
+                prevPageButton.disabled = currentPage === 1;
+                nextPageButton.disabled = currentPage === totalPages;
+            }
+        
+            prevPageButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayReviews();
+                }
+            });
+        
+            nextPageButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayReviews();
+                }
+            });
+        
+            showAllButton.addEventListener('click', () => {
+                currentPlatform = 'all';
+                filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
+                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+                currentPage = 1;
+                displayReviews();
+                updateFilterButtons();
+            });
+        
+            showGoogleButton.addEventListener('click', () => {
+                currentPlatform = 'google';
+                filteredReviews = allReviews.google;
+                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+                currentPage = 1;
+                displayReviews();
+                updateFilterButtons();
+            });
+        
+            showYandexButton.addEventListener('click', () => {
+                currentPlatform = 'yandex';
+                filteredReviews = allReviews.yandex;
+                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+                currentPage = 1;
+                displayReviews();
+                updateFilterButtons();
+            });
+        
+            show2gisButton.addEventListener('click', () => {
+                currentPlatform = '2gis';
+                filteredReviews = allReviews['2gis'];
+                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+                currentPage = 1;
+                displayReviews();
+                updateFilterButtons();
+            });
+        
+            function updateFilterButtons() {
+                showAllButton.classList.toggle('active', currentPlatform === 'all');
+                showGoogleButton.classList.toggle('active', currentPlatform === 'google');
+                showYandexButton.classList.toggle('active', currentPlatform === 'yandex');
+                show2gisButton.classList.toggle('active', currentPlatform === '2gis');
+            }
+        
+            loadReviews();
         });
-}
-
-    function displayReviews() {
-        reviewsContainer.innerHTML = '';
-
-        if (filteredReviews.length === 0) {
-            reviewsContainer.innerHTML = '<p>Нет доступных отзывов.</p>';
-            return;
-        }
-
-        const sortedReviews = [...filteredReviews].sort((a, b) => b.rating - a.rating);
-
-        const start = (currentPage - 1) * reviewsPerPage;
-        const end = start + reviewsPerPage;
-        const paginatedReviews = sortedReviews.slice(start, end);
-
-        paginatedReviews.forEach(review => {
-            const cleanAvatarUrl = review.avatarUrl ? review.avatarUrl.replace(/^\/+|\/+$/g, '') : '';
-            const reviewElement = document.createElement('div');
-            reviewElement.classList.add('review');
-
-            const avatarElement = document.createElement('div');
-            avatarElement.classList.add('review-avatar');
-
-            if (cleanAvatarUrl) {
-                avatarElement.style.backgroundImage = `url(${cleanAvatarUrl})`;
-            } else {
-                avatarElement.textContent = review.author.charAt(0);
-            }
-
-            reviewElement.innerHTML = `
-                ${avatarElement.outerHTML}
-                <div class="review-content">
-                    <div class="review-author">${review.author}</div>
-                    <div class="review-date">${review.date}</div>
-                    <div class="review-rating">Рейтинг: ${review.rating}</div>
-                    <div class="review-platform">
-                        Платформа: <a href="${review.platformUrl}" target="_blank">${review.platform}</a>
-                    </div>
-                    <div class="review-text">${review.reviewText}</div>
-                </div>
-            `;
-
-            reviewsContainer.appendChild(reviewElement);
-        });
-
-        updatePaginationButtons();
-    }
-
-    function updateSummary(googleRating, yandexRating, twoGisRating) {
-        const summaryElement = document.getElementById('average-rating');
-
-        const ratings = [googleRating, yandexRating, twoGisRating].filter(r => r !== null && r !== undefined);
-        const averageRating = ratings.reduce((acc, rating) => acc + parseFloat(rating), 0) / ratings.length;
-
-        summaryElement.innerHTML = `
-            Средний рейтинг: ${averageRating.toFixed(1)} <br>
-            Google Maps: ${googleRating} <br>
-            Яндекс Карты: ${yandexRating} <br>
-            2ГИС: ${twoGisRating}
-        `;
-    }
-
-    function updatePageIndicators() {
-        pageIndicators.innerHTML = '';
-        for (let i = 1; i <= totalPages; i++) {
-            const indicator = document.createElement('span');
-            indicator.classList.add('page-indicator');
-            if (i === currentPage) {
-                indicator.classList.add('active');
-            }
-            pageIndicators.appendChild(indicator);
-        }
-    }
-
-    function updatePaginationButtons() {
-        prevPageButton.disabled = currentPage === 1;
-        nextPageButton.disabled = currentPage === totalPages;
-    }
-
-    prevPageButton.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            displayReviews();
-        }
-    });
-
-    nextPageButton.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayReviews();
-        }
-    });
-
-    showAllButton.addEventListener('click', () => {
-        currentPlatform = 'all';
-        filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
-        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-        currentPage = 1;
-        displayReviews();
-        updateFilterButtons();
-    });
-
-    showGoogleButton.addEventListener('click', () => {
-        currentPlatform = 'google';
-        filteredReviews = allReviews.google;
-        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-        currentPage = 1;
-        displayReviews();
-        updateFilterButtons();
-    });
-
-    showYandexButton.addEventListener('click', () => {
-        currentPlatform = 'yandex';
-        filteredReviews = allReviews.yandex;
-        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-        currentPage = 1;
-        displayReviews();
-        updateFilterButtons();
-    });
-
-    show2gisButton.addEventListener('click', () => {
-        currentPlatform = '2gis';
-        filteredReviews = allReviews['2gis'];
-        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-        currentPage = 1;
-        displayReviews();
-        updateFilterButtons();
-    });
-
-    function updateFilterButtons() {
-        showAllButton.classList.toggle('active', currentPlatform === 'all');
-        showGoogleButton.classList.toggle('active', currentPlatform === 'google');
-        showYandexButton.classList.toggle('active', currentPlatform === 'yandex');
-        show2gisButton.classList.toggle('active', currentPlatform === '2gis');
-    }
-
-    loadReviews();
-});
-
-
-    </script>
-</body>
-</html>
+            </script>
+        </body>
+        </html>
