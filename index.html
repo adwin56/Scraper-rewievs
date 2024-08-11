@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Ошибка при загрузке данных:', error);
         });
     }
-    
+
     function displayReviews() {
         reviewsContainer.innerHTML = '';
 
@@ -300,8 +300,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateSummary(googleRating, yandexRating, twoGisRating) {
         const summaryElement = document.getElementById('average-rating');
+        
+        // Расчет общего среднего рейтинга
+        const ratings = [googleRating, yandexRating, twoGisRating].filter(r => r !== null && r !== undefined);
+        const averageRating = ratings.reduce((acc, rating) => acc + parseFloat(rating), 0) / ratings.length;
+        
         summaryElement.innerHTML = `
-            Средний рейтинг: <br>
+            Средний рейтинг: ${averageRating.toFixed(1)} <br>
             Google Maps: ${googleRating} <br>
             Яндекс Карты: ${yandexRating} <br>
             2ГИС: ${twoGisRating}
