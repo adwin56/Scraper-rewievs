@@ -6,8 +6,12 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 
 try {
-    // Запускаем JS скрипт
-    $output = shell_exec('node scrape_reviews_yandex.js');
+    // Запускаем JS скрипт и логируем ошибки
+    $command = 'node scrape_reviews_yandex.js 2>&1';
+    $output = shell_exec($command);
+    
+    // Логируем вывод и ошибки
+    error_log("Вывод скрипта: " . $output);
     
     if ($output === null) {
         throw new Exception('Не удалось выполнить JS скрипт.');
@@ -19,7 +23,7 @@ try {
     }
 
     // Читаем JSON файл
-    $jsonData = file_get_contents('reviews.json');
+    $jsonData = file_get_contents('reviews2.json');
     echo $jsonData;
 } catch (Exception $e) {
     // Логируем и возвращаем ошибку
