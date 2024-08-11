@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отзывы компании</title>
     <style>
+        /* Ваш существующий стиль */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -58,6 +59,25 @@
             border-radius: 4px;
         }
 
+        .filter-buttons {
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .filter-buttons button.active {
+            background-color: #0056b3;
+        }
+
         .reviews-wrapper {
             position: relative;
             width: 100%;
@@ -92,7 +112,7 @@
             flex-direction: column;
             justify-content: flex-start;
             flex-shrink: 0;
-            height: 350px; /* Увеличиваем высоту для размещения аватарки */
+            height: 350px;
             overflow: hidden;
         }
 
@@ -117,7 +137,6 @@
             background-size: cover;
             background-position: center;
         }
-
 
         .review-author {
             font-weight: bold;
@@ -233,6 +252,12 @@
     <div class="container">
         <div class="summary">
             <div class="summary-item" id="average-rating">Средний рейтинг:</div>
+            <div class="filter-buttons">
+                <button id="show-all">Все отзывы</button>
+                <button id="show-google">Google Maps</button>
+                <button id="show-yandex">Яндекс Карты</button>
+                <button id="show-2gis">2ГИС</button>
+            </div>
         </div>
         <div class="reviews-wrapper">
             <div class="pagination pagination-left">
@@ -253,44 +278,56 @@ document.addEventListener('DOMContentLoaded', function () {
     const prevPageButton = document.getElementById('prev-page');
     const nextPageButton = document.getElementById('next-page');
     const pageIndicators = document.getElementById('page-indicators');
-    let reviews = [];
+    const showAllButton = document.getElementById('show-all');
+    const showGoogleButton = document.getElementById('show-google');
+    const showYandexButton = document.getElementById('show-yandex');
+    const show2gisButton = document.getElementById('show-2gis');
+    let allReviews = { google: [], yandex: [], '2gis': [] };
+    let filteredReviews = [];
     let currentPage = 1;
     const reviewsPerPage = 3;
     let totalPages = 1;
+    let currentPlatform = 'all';
 
     function loadReviews() {
-        fetch('fetch_reviews.php')
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('Ошибка при загрузке отзывов:', data.error);
-                    reviewsContainer.innerHTML = '<p>Не удалось загрузить отзывы.</p>';
-                    return;
-                }
+    fetch('fetch_reviews.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Ошибка при загрузке отзывов:', data.error);
+                reviewsContainer.innerHTML = '<p>Не удалось загрузить отзывы.</p>';
+                return;
+            }
 
-                reviews = [...data.yandexReviews, ...data['2gisReviews']]; // Объединяем массивы отзывов
+            // Преобразование yandexReviews в массив, если это объект
+            const yandexReviews = Array.isArray(data.yandexReviews) ? data.yandexReviews : Object.values(data.yandexReviews || {});
+            
+            allReviews.google = Array.isArray(data.googleReviews) ? data.googleReviews.slice(0, 6) : [];
+            allReviews.yandex = yandexReviews.slice(0, 6);
+            allReviews['2gis'] = Array.isArray(data['2gisReviews']) ? data['2gisReviews'].slice(0, 6) : [];
 
-                totalPages = Math.ceil(reviews.length / reviewsPerPage);
+            filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
+            totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
 
-                displayReviews();
-                updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
-                updatePageIndicators();
-            })
-            .catch(error => {
-                console.error('Ошибка при загрузке данных:', error);
-                reviewsContainer.innerHTML = '<p>Произошла ошибка при загрузке данных.</p>';
-            });
-    }
+            displayReviews();
+            updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
+            updatePageIndicators();
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке данных:', error);
+            reviewsContainer.innerHTML = '<p>Произошла ошибка при загрузке данных.</p>';
+        });
+}
 
     function displayReviews() {
         reviewsContainer.innerHTML = '';
 
-        if (reviews.length === 0) {
+        if (filteredReviews.length === 0) {
             reviewsContainer.innerHTML = '<p>Нет доступных отзывов.</p>';
             return;
         }
 
-        const sortedReviews = [...reviews].sort((a, b) => b.rating - a.rating);
+        const sortedReviews = [...filteredReviews].sort((a, b) => b.rating - a.rating);
 
         const start = (currentPage - 1) * reviewsPerPage;
         const end = start + reviewsPerPage;
@@ -305,10 +342,8 @@ document.addEventListener('DOMContentLoaded', function () {
             avatarElement.classList.add('review-avatar');
 
             if (cleanAvatarUrl) {
-                // Задаем URL для фонового изображения
                 avatarElement.style.backgroundImage = `url(${cleanAvatarUrl})`;
             } else {
-                // Если URL нет, показываем первую букву автора
                 avatarElement.textContent = review.author.charAt(0);
             }
 
@@ -376,10 +411,53 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    showAllButton.addEventListener('click', () => {
+        currentPlatform = 'all';
+        filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
+        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        currentPage = 1;
+        displayReviews();
+        updateFilterButtons();
+    });
+
+    showGoogleButton.addEventListener('click', () => {
+        currentPlatform = 'google';
+        filteredReviews = allReviews.google;
+        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        currentPage = 1;
+        displayReviews();
+        updateFilterButtons();
+    });
+
+    showYandexButton.addEventListener('click', () => {
+        currentPlatform = 'yandex';
+        filteredReviews = allReviews.yandex;
+        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        currentPage = 1;
+        displayReviews();
+        updateFilterButtons();
+    });
+
+    show2gisButton.addEventListener('click', () => {
+        currentPlatform = '2gis';
+        filteredReviews = allReviews['2gis'];
+        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        currentPage = 1;
+        displayReviews();
+        updateFilterButtons();
+    });
+
+    function updateFilterButtons() {
+        showAllButton.classList.toggle('active', currentPlatform === 'all');
+        showGoogleButton.classList.toggle('active', currentPlatform === 'google');
+        showYandexButton.classList.toggle('active', currentPlatform === 'yandex');
+        show2gisButton.classList.toggle('active', currentPlatform === '2gis');
+    }
+
     loadReviews();
 });
 
 
-    </script> 
+    </script>
 </body>
 </html>

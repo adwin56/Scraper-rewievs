@@ -46,9 +46,8 @@ try {
         '2ГИС' => 'https://2gis.ru/n_novgorod/inside/2674647933966364/firm/70000001021080960/tab/reviews?m=43.999939%2C56.311007%2F16%2Fp%2F0.3'
     ];
 
-    // Приводим данные к единообразному виду
-    $yandexReviews = array_map(function($review) use ($platformLinks) {
-        $platform = $review['platform'] ?? 'Неизвестно';
+    // Приводим данные к единообразному виду и распределяем по платформам
+    $googleReviews = array_map(function($review) use ($platformLinks) {
         $avatarUrl = trim($review['avatarUrl'], '\"/');
         return [
             'author' => $review['author'] ?? 'Неизвестный автор',
@@ -56,11 +55,28 @@ try {
             'rating' => $review['rating'] ?? 'Без рейтинга',
             'reviewText' => $review['text'] ?? 'Текст отсутствует',
             'avatarUrl' => $avatarUrl,
-            'platform' => $platform,
-            'platformUrl' => $platformLinks[$platform] ?? 'Неизвестная платформа'
+            'platform' => 'Google Maps',
+            'platformUrl' => $platformLinks['Google Maps']
         ];
-    }, $dataYandex['reviews'] ?? []);
-    
+    }, array_filter($dataYandex['reviews'] ?? [], function($review) {
+        return $review['platform'] === 'Google Maps';
+    }));
+
+    $yandexReviews = array_map(function($review) use ($platformLinks) {
+        $avatarUrl = trim($review['avatarUrl'], '\"/');
+        return [
+            'author' => $review['author'] ?? 'Неизвестный автор',
+            'date' => $review['date'] ?? 'Дата отсутствует',
+            'rating' => $review['rating'] ?? 'Без рейтинга',
+            'reviewText' => $review['text'] ?? 'Текст отсутствует',
+            'avatarUrl' => $avatarUrl,
+            'platform' => 'Яндекс Карты',
+            'platformUrl' => $platformLinks['Яндекс Карты']
+        ];
+    }, array_filter($dataYandex['reviews'] ?? [], function($review) {
+        return $review['platform'] === 'Яндекс Карты';
+    }));
+
     $twoGISReviews = array_map(function($review) use ($platformLinks) {
         $avatarUrl = trim($review['avatarUrl'], '\"/');
         return [
@@ -76,11 +92,12 @@ try {
 
     // Объединяем данные
     $mergedData = [
+        'googleReviews' => $googleReviews,
         'yandexReviews' => $yandexReviews,
         '2gisReviews' => $twoGISReviews,
+        'averageRatingGoogle' => $dataYandex['averageRatings']['Google Maps'] ?? null,
         'averageRatingYandex' => $dataYandex['averageRatings']['Яндекс Карты'] ?? null,
-        'averageRating2GIS' => $data2GIS['averageRating2GIS'] ?? null,
-        'averageRatingGoogle' => $dataYandex['averageRatings']['Google Maps'] ?? null
+        'averageRating2GIS' => $data2GIS['averageRating2GIS'] ?? null
     ];
 
     // Возврат объединенных данных в формате JSON
