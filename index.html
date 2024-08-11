@@ -80,6 +80,20 @@
             background: #ffb81c;
             border-radius: 4px;
         }
+        .load-more {
+            display: block;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .load-more:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -112,59 +126,76 @@
         <div class="reviews-container" id="reviews-container">
             <!-- Отзывы будут загружены сюда -->
         </div>
+        <button class="load-more" id="load-more">Больше отзывов</button>
     </div>
 
     <script>
-        // Запрос к PHP-скрипту для получения отзывов
-        fetch('parse_reviews.php')
-            .then(response => response.json())
-            .then(reviews => {
-                if (reviews.error) {
-                    console.error('Ошибка:', reviews.error);
-                    return;
-                }
-                
-                // Элементы для отображения рейтинга
-                const reviewsContainer = document.getElementById('reviews-container');
-                const ratingCounts = [0, 0, 0, 0, 0]; // Счетчики для рейтингов от 1 до 5
-                let totalRating = 0;
-                let reviewCount = 0;
+        let currentPage = 1;
+        const reviewsPerPage = 5;
 
-                reviews.forEach(review => {
-                    const reviewElement = document.createElement('div');
-                    reviewElement.classList.add('review');
-                    reviewElement.innerHTML = `
-                        <div class="review-author">${review.author}</div>
-                        <div class="review-date">${review.date}</div>
-                        <div class="review-rating">${'⭐'.repeat(review.rating)}</div>
-                        <div class="review-text">${review.reviewText}</div>
-                        <div class="review-response">${review.response}</div>
-                    `;
-                    reviewsContainer.appendChild(reviewElement);
-
-                    // Подсчет рейтингов
-                    const rating = parseInt(review.rating, 10);
-                    if (rating >= 1 && rating <= 5) {
-                        ratingCounts[rating - 1]++;
-                        totalRating += rating;
-                        reviewCount++;
+        function fetchReviews(page) {
+            return fetch(`parse_reviews.php?page=${page}&limit=${reviewsPerPage}`)
+                .then(response => response.json())
+                .then(reviews => {
+                    if (reviews.error) {
+                        console.error('Ошибка:', reviews.error);
+                        return [];
                     }
+                    return reviews;
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке отзывов:', error);
+                    return [];
                 });
+        }
 
-                // Вычисление среднего рейтинга
-                const averageRating = reviewCount > 0 ? (totalRating / reviewCount).toFixed(1) : 0;
-                document.getElementById('average-rating').textContent = `Средний рейтинг: ${averageRating}⭐`;
+        function displayReviews(reviews) {
+            const reviewsContainer = document.getElementById('reviews-container');
+            const ratingCounts = [0, 0, 0, 0, 0];
+            let totalRating = 0;
+            let reviewCount = 0;
 
-                // Обновление отображения распределения оценок
-                ratingCounts.forEach((count, index) => {
-                    const ratingBar = document.getElementById(`rating-${5 - index}`);
-                    const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
-                    ratingBar.style.width = `${percentage}%`;
-                });
-            })
-            .catch(error => {
-                console.error('Ошибка при загрузке отзывов:', error);
+            reviews.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.innerHTML = `
+                    <div class="review-author">${review.author}</div>
+                    <div class="review-date">${review.date}</div>
+                    <div class="review-rating">${'⭐'.repeat(review.rating)}</div>
+                    <div class="review-text">${review.reviewText}</div>
+                    <div class="review-response">${review.response || ''}</div>
+                `;
+                reviewsContainer.appendChild(reviewElement);
+
+                const rating = parseInt(review.rating, 10);
+                if (rating >= 1 && rating <= 5) {
+                    ratingCounts[rating - 1]++;
+                    totalRating += rating;
+                    reviewCount++;
+                }
             });
+
+            const averageRating = reviewCount > 0 ? (totalRating / reviewCount).toFixed(1) : 0;
+            document.getElementById('average-rating').textContent = `Средний рейтинг: ${averageRating}⭐`;
+
+            ratingCounts.forEach((count, index) => {
+                const ratingBar = document.getElementById(`rating-${5 - index}`);
+                const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
+                ratingBar.style.width = `${percentage}%`;
+            });
+        }
+
+        document.getElementById('load-more').addEventListener('click', async () => {
+            currentPage++;
+            const reviews = await fetchReviews(currentPage);
+            displayReviews(reviews);
+        });
+
+        // Загрузка первых отзывов при загрузке страницы
+        (async () => {
+            const initialReviews = await fetchReviews(currentPage);
+            displayReviews(initialReviews);
+        })();
     </script>
 </body>
 </html>

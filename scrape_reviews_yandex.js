@@ -79,7 +79,7 @@ const fs = require('fs');
 
         console.log('Сохранение отзывов в файл JSON...');
         // Сохранение отзывов в файл JSON
-        fs.writeFileSync('reviews2.json', JSON.stringify(reviews, null, 2));
+        console.log(JSON.stringify(reviews, null, 2));
 
         console.log('Отзывы сохранены в файл reviews.json');
 
