@@ -5,138 +5,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отзывы компании</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative; /* Для стрелочек */
-        }
-        .reviews-wrapper {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            padding: 10px 0;
-        }
-        .reviews-container {
-            display: flex;
-            flex-wrap: nowrap;
-            width: max-content;
-        }
-        .review {
-            box-sizing: border-box;
-            width: 300px; /* Фиксированная ширина отзыва */
-            margin-right: 15px; /* Отступ между отзывами */
-            border: 1px solid #eee;
-            border-radius: 5px;
-            background: #fafafa;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            height: auto; /* Высота автоматически расширяется */
-        }
-        .review:last-child {
-            margin-right: 0; /* Убираем отступ у последнего отзыва */
-        }
-        .review-author {
-            font-weight: bold;
-            margin-bottom: 5px; /* Уменьшен отступ */
-        }
-        .review-date {
-            font-size: 0.9em;
-            color: #888;
-            margin-bottom: 5px; /* Уменьшен отступ */
-        }
-        .review-rating {
-            margin-bottom: 5px; /* Уменьшен отступ */
-        }
-        .review-text {
-            margin-top: 10px; /* Отступ от других элементов */
-            overflow: hidden; /* Скроем переполнение по горизонтали */
-            text-overflow: ellipsis; /* Обрезаем текст с троеточием, если не помещается */
-            white-space: normal; /* Разрешаем перенос текста на новую строку */
-            word-wrap: break-word; /* Переносим длинные слова */
-        }
-        .review-response {
-            font-style: italic;
-            color: #666;
-        }
-        .summary {
-            margin-bottom: 20px;
-        }
-        .summary-item {
-            margin-bottom: 10px;
-        }
-        .rating-bar {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .rating-bar span {
-            margin-right: 5px;
-            font-weight: bold;
-        }
-        .rating-bar div {
-            height: 20px;
-            width: 200px;
-            background: #ddd;
-            border-radius: 4px;
-            position: relative;
-        }
-        .rating-bar div::after {
-            content: '';
-            display: block;
-            height: 100%;
-            background: #ffb81c;
-            border-radius: 4px;
-        }
-        .load-more {
-            display: block;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .load-more:hover {
-            background-color: #0056b3;
-        }
-        .pagination {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            transform: translateY(-50%);
-            display: flex;
-            justify-content: space-between;
-            pointer-events: none; /* Чтобы стрелочки не перекрывали содержимое */
-        }
-        .pagination button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #007bff;
-            pointer-events: auto; /* Чтобы стрелочки были кликабельны */
-        }
-        .pagination button:hover {
-            color: #0056b3;
-        }
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.summary {
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    margin-bottom: 10px;
+}
+
+.rating-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.rating-bar span {
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+.rating-bar div {
+    height: 20px;
+    width: 200px;
+    background: #ddd;
+    border-radius: 4px;
+    position: relative;
+}
+
+.rating-bar div::after {
+    content: '';
+    display: block;
+    height: 100%;
+    background: #ffb81c;
+    border-radius: 4px;
+}
+
+.reviews-wrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.reviews-container {
+    display: flex;
+    align-items: flex-start;
+    width: calc(100% - 50px); /* Уменьшаем ширину контейнера, чтобы оставить место для стрелок */
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 0;
+    padding-left: 50px; /* Добавляем отступ слева для сдвига отзывов вправо */
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    position: relative;
+}
+
+.review {
+    box-sizing: border-box;
+    width: 300px;
+    margin-right: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background: #fafafa;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-shrink: 0;
+}
+
+.review:last-child {
+    margin-right: 0;
+}
+
+.review-author {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.review-date {
+    font-size: 0.9em;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.review-rating {
+    margin-bottom: 5px;
+}
+
+.review-text {
+    margin-top: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.review-response {
+    font-style: italic;
+    color: #666;
+}
+
+.load-more {
+    display: block;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.load-more:hover {
+    background-color: #0056b3;
+}
+
+.pagination {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.pagination button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #007bff;
+    pointer-events: auto;
+}
+
+.pagination button:hover {
+    color: #0056b3;
+}
+
+.pagination-left {
+    position: absolute;
+    left: 10px;
+}
+
+.pagination-right {
+    position: absolute;
+    right: 10px;
+}
+
     </style>
 </head>
 <body>
@@ -167,13 +205,15 @@
             </div>
         </div>
         <div class="reviews-wrapper">
+            <div class="pagination pagination-left">
+                <button id="prev-page">&#9664;</button> <!-- Стрелочка влево -->
+            </div>
             <div class="reviews-container" id="reviews-container">
                 <!-- Отзывы будут загружены сюда -->
             </div>
-        </div>
-        <div class="pagination">
-            <button id="prev-page">&#9664;</button> <!-- Стрелочка влево -->
-            <button id="next-page">&#9654;</button> <!-- Стрелочка вправо -->
+            <div class="pagination pagination-right">
+                <button id="next-page">&#9654;</button> <!-- Стрелочка вправо -->
+            </div>
         </div>
         <a href="https://your-link-to-external-reviews-page.com" class="load-more" id="load-more">Перейти на страницу отзывов</a>
     </div>

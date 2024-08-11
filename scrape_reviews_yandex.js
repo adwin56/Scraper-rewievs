@@ -3,6 +3,10 @@ const fs = require('fs');
 
 (async () => {
     let allReviews = [];
+    let platformRatings = {
+        'Google Maps': [],
+        'Яндекс Карты': []
+    };
 
     try {
         console.log('Запуск браузера...');
@@ -45,7 +49,7 @@ const fs = require('fs');
             const reviewsArray = [];
             reviewNodes.forEach(node => {
                 const author = node.querySelector('.d4r55') ? node.querySelector('.d4r55').innerText : 'Неизвестный автор';
-                const rating = node.querySelector('.kvMYJc') ? node.querySelector('.kvMYJc').getAttribute('aria-label').split(' ')[0] : 'Без рейтинга';
+                const rating = node.querySelector('.kvMYJc') ? parseFloat(node.querySelector('.kvMYJc').getAttribute('aria-label').split(' ')[0]) : 'Без рейтинга';
                 const date = node.querySelector('.rsqaWe') ? node.querySelector('.rsqaWe').innerText : 'Дата отсутствует';
                 const text = node.querySelector('.wiI7pd') ? node.querySelector('.wiI7pd').innerText : 'Текст отсутствует';
 
@@ -53,53 +57,67 @@ const fs = require('fs');
                     author: author,
                     rating: rating,
                     date: date,
-                    text: text
+                    text: text,
+                    platform: 'Google Maps'
                 });
             });
             return reviewsArray;
         });
         allReviews = allReviews.concat(googleReviews);
+        platformRatings['Google Maps'] = googleReviews.map(r => r.rating).filter(r => r !== 'Без рейтинга');
 
-// Парсинг отзывов с Яндекс Карт
+        // Парсинг отзывов с Яндекс Карт
+        console.log('Переход на страницу с отзывами на Яндекс Картах...');
+        await page.goto('https://yandex.ru/maps/org/daymond_klinik/164798670887/reviews/?indoorLevel=1&ll=49.123700%2C55.790012&z=16', { waitUntil: 'networkidle2' });
 
-console.log('Переход на страницу с отзывами на Яндекс Картах...');
-await page.goto('https://yandex.ru/maps/org/daymond_klinik/164798670887/reviews/?indoorLevel=1&ll=49.123700%2C55.790012&z=16', { waitUntil: 'networkidle2' });
+        console.log('Извлечение отзывов с Яндекс Картах...');
+        const yandexReviews = await page.evaluate(() => {
+            const reviewNodes = document.querySelectorAll('.business-review-view__info');
+            const reviewsArray = [];
+            reviewNodes.forEach(node => {
+                const author = node.querySelector('.business-review-view__author-name') ? node.querySelector('.business-review-view__author-name').innerText : 'Неизвестный автор';
+                const date = node.querySelector('.business-review-view__date') ? node.querySelector('.business-review-view__date').innerText : 'Дата отсутствует';
 
-console.log('Извлечение отзывов с Яндекс Картах...');
-const yandexReviews = await page.evaluate(() => {
-    const reviewNodes = document.querySelectorAll('.business-review-view__info');
-    const reviewsArray = [];
-    reviewNodes.forEach(node => {
-        const author = node.querySelector('.business-review-view__author-name') ? node.querySelector('.business-review-view__author-name').innerText : 'Неизвестный автор';
-        const date = node.querySelector('.business-review-view__date') ? node.querySelector('.business-review-view__date').innerText : 'Дата отсутствует';
+                const fullStars = node.querySelectorAll('.business-rating-badge-view__star._full').length;
+                const emptyStars = node.querySelectorAll('.business-rating-badge-view__star._empty').length;
+                const rating = fullStars > 0 ? fullStars : 'Без рейтинга';
 
-        const fullStars = node.querySelectorAll('.business-rating-badge-view__star._full').length;
-        const emptyStars = node.querySelectorAll('.business-rating-badge-view__star._empty').length;
-        const rating = fullStars + emptyStars > 0 ? fullStars : 'Без рейтинга';
+                const reviewText = node.querySelector('.business-review-view__body-text') ? node.querySelector('.business-review-view__body-text').innerText : 'Текст отсутствует';
 
-        const reviewText = node.querySelector('.business-review-view__body-text') ? node.querySelector('.business-review-view__body-text').innerText : 'Текст отсутствует';
-
-        reviewsArray.push({
-            author: author,
-            rating: rating,
-            date: date,
-            text: reviewText
+                reviewsArray.push({
+                    author: author,
+                    rating: rating,
+                    date: date,
+                    text: reviewText,
+                    platform: 'Яндекс Карты'
+                });
+            });
+            return reviewsArray;
         });
-    });
-    return reviewsArray;
-});
-allReviews = allReviews.concat(yandexReviews);
-console.log('Количество отзывов с Google Maps:', googleReviews.length);
-console.log('Количество отзывов с Яндекс Карт:', yandexReviews.length);
+        allReviews = allReviews.concat(yandexReviews);
+        platformRatings['Яндекс Карты'] = yandexReviews.map(r => r.rating).filter(r => r !== 'Без рейтинга');
 
-// Сохранение всех отзывов в один файл JSON
-console.log('Сохранение всех отзывов в файл JSON...');
-fs.writeFileSync('reviews2.json', JSON.stringify(allReviews, null, 2));
-console.log('Все отзывы сохранены в файл reviews2.json');
+        console.log('Количество отзывов с Google Maps:', googleReviews.length);
+        console.log('Количество отзывов с Яндекс Карты:', yandexReviews.length);
 
-await browser.close();
-console.log('Браузер закрыт.');
-} catch (error) {
-console.error('Ошибка выполнения скрипта:', error);
-}
+        // Вычисление средней оценки для каждой платформы
+        const averageRatings = {};
+        for (const [platform, ratings] of Object.entries(platformRatings)) {
+            const average = ratings.length > 0 ? (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1) : 'Нет данных';
+            averageRatings[platform] = average;
+        }
+
+        // Сохранение всех отзывов в один файл JSON
+        console.log('Сохранение всех отзывов в файл JSON...');
+        fs.writeFileSync('reviews2.json', JSON.stringify({
+            reviews: allReviews,
+            averageRatings: averageRatings
+        }, null, 2));
+        console.log('Все отзывы сохранены в файл reviews2.json');
+
+        await browser.close();
+        console.log('Браузер закрыт.');
+    } catch (error) {
+        console.error('Ошибка выполнения скрипта:', error);
+    }
 })();
