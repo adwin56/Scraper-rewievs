@@ -4,7 +4,7 @@ const fs = require('fs');
 (async () => {
     try {
         console.log('Запуск браузера...');
-        const browser = await puppeteer.launch({ headless: false }); // запуск браузера в видимом режиме
+        const browser = await puppeteer.launch({ headless: true }); // запуск браузера в видимом режиме
         const page = await browser.newPage();
 
         // Переход на страницу с отзывами
@@ -12,7 +12,7 @@ const fs = require('fs');
         await page.goto('https://yandex.ru/maps/org/daymond_klinik/164798670887/reviews/?indoorLevel=1&ll=49.123700%2C55.790012&z=16', { waitUntil: 'networkidle2' });
 
         // Ждем появления блока отзывов
-        const scrollableDivSelector = '.business-review-view__info'; // Замените на корректный селектор вашего блока
+        const scrollableDivSelector = '.scroll__scrollbar-track'; // Замените на корректный селектор вашего блока
         console.log('Ожидание появления блока отзывов...');
         await page.waitForSelector(scrollableDivSelector);
 
@@ -59,8 +59,9 @@ const fs = require('fs');
                 const date = node.querySelector('.business-review-view__date') ? node.querySelector('.business-review-view__date').innerText : 'Дата отсутствует';
 
                 // Подсчет количества звезд для получения рейтинга
-                const ratingStars = node.querySelectorAll('.business-rating-badge-view__star');
-                const rating = ratingStars.length || 'Без рейтинга';
+                const fullStars = node.querySelectorAll('.business-rating-badge-view__star._full').length;
+                const emptyStars = node.querySelectorAll('.business-rating-badge-view__star._empty').length;
+                const rating = fullStars + emptyStars > 0 ? fullStars : 'Без рейтинга';
 
                 const reviewText = node.querySelector('.business-review-view__body-text') ? node.querySelector('.business-review-view__body-text').innerText : 'Текст отсутствует';
 
