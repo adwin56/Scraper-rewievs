@@ -10,7 +10,7 @@ const fs = require('fs');
 
     try {
         console.log('Запуск браузера...');
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
 
         // Парсинг отзывов с Google Maps
@@ -52,12 +52,16 @@ const fs = require('fs');
                 const rating = node.querySelector('.kvMYJc') ? parseFloat(node.querySelector('.kvMYJc').getAttribute('aria-label').split(' ')[0]) : 'Без рейтинга';
                 const date = node.querySelector('.rsqaWe') ? node.querySelector('.rsqaWe').innerText : 'Дата отсутствует';
                 const text = node.querySelector('.wiI7pd') ? node.querySelector('.wiI7pd').innerText : 'Текст отсутствует';
+                
+                // Извлечение аватарок
+                const avatarImg = node.querySelector('.NBa7we') ? node.querySelector('.NBa7we').getAttribute('src') : 'Аватар отсутствует';
 
                 reviewsArray.push({
                     author: author,
                     rating: rating,
                     date: date,
                     text: text,
+                    avatarUrl: avatarImg,
                     platform: 'Google Maps'
                 });
             });
@@ -84,11 +88,25 @@ const fs = require('fs');
 
                 const reviewText = node.querySelector('.business-review-view__body-text') ? node.querySelector('.business-review-view__body-text').innerText : 'Текст отсутствует';
 
+                // Извлечение аватарок
+                const avatarNode = node.querySelector('.business-review-view__user-icon .user-icon-view__icon');
+                let avatarUrl = 'Аватар отсутствует';
+
+                if (avatarNode) {
+                    const style = avatarNode.getAttribute('style');
+                    if (style && style.includes('background-image')) {
+                        avatarUrl = style.match(/url\((.*?)\)/)[1];
+                    } else {
+                        avatarUrl = avatarNode.textContent || 'Аватар отсутствует';
+                    }
+                }
+
                 reviewsArray.push({
                     author: author,
                     rating: rating,
                     date: date,
                     text: reviewText,
+                    avatarUrl: avatarUrl,
                     platform: 'Яндекс Карты'
                 });
             });
