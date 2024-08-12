@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 
-(async () => {
+async function runParser() {
   let allReviews = [];
   let platformRatings = {
     "Google Maps": [],
@@ -191,4 +191,20 @@ const fs = require("fs");
   } catch (error) {
     console.error("Ошибка выполнения скрипта:", error);
   }
-})();
+}
+
+function startAtMidnight() {
+  const now = new Date();
+  const nextMidnight = new Date(now);
+  nextMidnight.setHours(24, 0, 0, 0); // Установить время на следующую полночь
+
+  const timeUntilNextMidnight = nextMidnight - now;
+  console.log(`Скрипт начнет работу через ${timeUntilNextMidnight / 1000} секунд.`);
+
+  setTimeout(() => {
+    runParser(); // Запускаем парсер
+    setInterval(runParser, 24 * 60 * 60 * 1000); // Затем запускаем его каждые 24 часа
+  }, timeUntilNextMidnight);
+}
+
+startAtMidnight();
