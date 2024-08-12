@@ -1,358 +1,378 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Отзывы компании</title>
     <style>
-        /* Ваш существующий стиль */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+      /* Ваш существующий стиль */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
 
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
+      .container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
 
-        .summary {
-            margin-bottom: 20px;
-        }
+      .summary {
+        margin-bottom: 20px;
+      }
 
-        .summary-item {
-            margin-bottom: 10px;
-        }
+      .summary-item {
+        margin-bottom: 10px;
+      }
 
-        .rating-bar {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
+      .rating-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
 
-        .rating-bar span {
-            margin-right: 5px;
-            font-weight: bold;
-        }
+      .rating-bar span {
+        margin-right: 5px;
+        font-weight: bold;
+      }
 
-        .rating-bar div {
-            height: 20px;
-            width: 200px;
-            background: #ddd;
-            border-radius: 4px;
-            position: relative;
-        }
+      .rating-bar div {
+        height: 20px;
+        width: 200px;
+        background: #ddd;
+        border-radius: 4px;
+        position: relative;
+      }
 
-        .rating-bar div::after {
-            content: '';
-            display: block;
-            height: 100%;
-            background: #ffb81c;
-            border-radius: 4px;
-        }
+      .rating-bar div::after {
+        content: "";
+        display: block;
+        height: 100%;
+        background: #ffb81c;
+        border-radius: 4px;
+      }
 
-        .filter-buttons {
-            margin-bottom: 20px;
-        }
+      .filter-buttons {
+        margin-bottom: 20px;
+      }
 
-        .filter-buttons button {
-            padding: 10px 20px;
-            margin-right: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            font-size: 16px;
-        }
+      .filter-buttons button {
+        padding: 10px 20px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+      }
 
-        .filter-buttons button.active {
-            background-color: #0056b3;
-        }
+      .filter-buttons button.active {
+        background-color: #0056b3;
+      }
 
-        .reviews-wrapper {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-        }
+      .reviews-wrapper {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+      }
 
-        .reviews-container {
-            display: flex;
-            align-items: flex-start;
-            width: calc(100% - 50px);
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 10px 0;
-            padding-left: 50px;
-            white-space: nowrap;
-            scroll-behavior: smooth;
-            position: relative;
-        }
+      .reviews-container {
+        display: flex;
+        align-items: flex-start;
+        width: calc(100% - 50px);
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px 0;
+        padding-left: 50px;
+        white-space: nowrap;
+        scroll-behavior: smooth;
+        position: relative;
+      }
 
-        .review {
-            box-sizing: border-box;
-            width: 300px;
-            margin-right: 15px;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            background: #fafafa;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            flex-shrink: 0;
-            height: 350px;
-            overflow: hidden;
-        }
+      .review {
+        box-sizing: border-box;
+        width: 300px;
+        margin-right: 15px;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        background: #fafafa;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        flex-shrink: 0;
+        height: 350px;
+        overflow: hidden;
+      }
 
-        .review-content {
-            overflow: auto;
-            height: 100%;
-        }
+      .review-content {
+        overflow: auto;
+        height: 100%;
+      }
 
-        .review-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-            background-color: #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-            text-transform: uppercase;
-            background-size: cover;
-            background-position: center;
-        }
+      .review-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        background-color: #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        background-size: cover;
+        background-position: center;
+      }
 
-        .review-author {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+      .review-author {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
 
-        .review-date {
-            font-size: 0.9em;
-            color: #888;
-            margin-bottom: 5px;
-        }
+      .review-date {
+        font-size: 0.9em;
+        color: #888;
+        margin-bottom: 5px;
+      }
 
-        .review-rating {
-            margin-bottom: 5px;
-        }
+      .review-rating {
+        margin-bottom: 5px;
+      }
 
-        .review-platform {
-            font-size: 0.9em;
-            color: #333;
-            margin-bottom: 5px;
-        }
+      .review-platform {
+        font-size: 0.9em;
+        color: #333;
+        margin-bottom: 5px;
+      }
 
-        .review-platform a {
-            color: #007bff;
-            text-decoration: none;
-        }
+      .review-platform a {
+        color: #007bff;
+        text-decoration: none;
+      }
 
-        .review-platform a:hover {
-            text-decoration: underline;
-        }
+      .review-platform a:hover {
+        text-decoration: underline;
+      }
 
-        .review-text {
-            margin-top: 10px;
-            white-space: normal;
-            word-wrap: break-word;
-        }
+      .review-text {
+        margin-top: 10px;
+        white-space: normal;
+        word-wrap: break-word;
+      }
 
-        .review-response {
-            font-style: italic;
-            color: #666;
-        }
+      .review-response {
+        font-style: italic;
+        color: #666;
+      }
 
-        .load-more {
-            display: block;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-        }
+      .load-more {
+        display: block;
+        margin: 20px 0;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+      }
 
-        .load-more:hover {
-            background-color: #0056b3;
-        }
+      .load-more:hover {
+        background-color: #0056b3;
+      }
 
-        .pagination {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            align-items: center;
-            pointer-events: none;
-            z-index: 1;
-        }
+      .pagination {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+        z-index: 1;
+      }
 
-        .pagination button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #007bff;
-            pointer-events: auto;
-        }
+      .pagination button {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #007bff;
+        pointer-events: auto;
+      }
 
-        .pagination button:hover {
-            color: #0056b3;
-        }
+      .pagination button:hover {
+        color: #0056b3;
+      }
 
-        .pagination-left {
-            position: absolute;
-            left: 10px;
-        }
+      .pagination-left {
+        position: absolute;
+        left: 10px;
+      }
 
-        .pagination-right {
-            position: absolute;
-            right: 10px;
-        }
+      .pagination-right {
+        position: absolute;
+        right: 10px;
+      }
 
-        .pagination-dots {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
+      .pagination-dots {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+      }
 
-        .pagination-dots .dot {
-            height: 10px;
-            width: 10px;
-            background-color: #007bff;
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 3px;
-            cursor: pointer;
-        }
+      .pagination-dots .dot {
+        height: 10px;
+        width: 10px;
+        background-color: #007bff;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 3px;
+        cursor: pointer;
+      }
 
-        .pagination-dots .dot.active {
-            background-color: #0056b3;
-        }
+      .pagination-dots .dot.active {
+        background-color: #0056b3;
+      }
 
-        .pagination-dots .dot.current {
-            background-color: #ff5722;
-        }
+      .pagination-dots .dot.current {
+        background-color: #ff5722;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="summary">
-            <div class="summary-item" id="average-rating">Средний рейтинг:</div>
-            <div class="filter-buttons">
-                <button id="show-all">Все отзывы</button>
-                <button id="show-google">Google Maps</button>
-                <button id="show-yandex">Яндекс Карты</button>
-                <button id="show-2gis">2ГИС</button>
-            </div>
+      <div class="summary">
+        <div class="summary-item" id="average-rating">Средний рейтинг:</div>
+        <div class="filter-buttons">
+          <button id="show-all">Все отзывы</button>
+          <button id="show-google">Google Maps</button>
+          <button id="show-yandex">Яндекс Карты</button>
+          <button id="show-2gis">2ГИС</button>
         </div>
-        <div class="reviews-wrapper">
-            <div class="pagination pagination-left">
-                <button id="prev-page">&#9664;</button>
-            </div>
-            <div class="reviews-container" id="reviews-container">
-                <!-- Отзывы будут загружены сюда -->
-            </div>
-            <div class="pagination pagination-right">
-                <button id="next-page">&#9654;</button>
-            </div>
+      </div>
+      <div class="reviews-wrapper">
+        <div class="pagination pagination-left">
+          <button id="prev-page">&#9664;</button>
         </div>
-        <div class="pagination-dots" id="pagination-dots"></div>
+        <div class="reviews-container" id="reviews-container">
+          <!-- Отзывы будут загружены сюда -->
+        </div>
+        <div class="pagination pagination-right">
+          <button id="next-page">&#9654;</button>
+        </div>
+      </div>
+      <div class="pagination-dots" id="pagination-dots"></div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const reviewsContainer = document.getElementById('reviews-container');
-            const prevPageButton = document.getElementById('prev-page');
-            const nextPageButton = document.getElementById('next-page');
-            const paginationDots = document.getElementById('pagination-dots');
-            const showAllButton = document.getElementById('show-all');
-            const showGoogleButton = document.getElementById('show-google');
-            const showYandexButton = document.getElementById('show-yandex');
-            const show2gisButton = document.getElementById('show-2gis');
-            let allReviews = { google: [], yandex: [], '2gis': [] };
-            let filteredReviews = [];
-            let currentPage = 1;
-            const reviewsPerPage = 3;
-            let totalPages = 1;
-            let currentPlatform = 'all';
-        
-            function loadReviews() {
-                fetch('fetch_reviews.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            console.error('Ошибка при загрузке отзывов:', data.error);
-                            reviewsContainer.innerHTML = '<p>Не удалось загрузить отзывы.</p>';
-                            return;
-                        }
-        
-                        // Преобразование yandexReviews в массив, если это объект
-                        const yandexReviews = Array.isArray(data.yandexReviews) ? data.yandexReviews : Object.values(data.yandexReviews || {});
-                        
-                        allReviews.google = Array.isArray(data.googleReviews) ? data.googleReviews.slice(0, 6) : [];
-                        allReviews.yandex = yandexReviews.slice(0, 6);
-                        allReviews['2gis'] = Array.isArray(data['2gisReviews']) ? data['2gisReviews'].slice(0, 6) : [];
-        
-                        filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
-                        totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-        
-                        displayReviews();
-                        updateSummary(data.averageRatingGoogle, data.averageRatingYandex, data.averageRating2GIS);
-                        updatePaginationDots();
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при загрузке данных:', error);
-                        reviewsContainer.innerHTML = '<p>Произошла ошибка при загрузке данных.</p>';
-                    });
+      document.addEventListener("DOMContentLoaded", function () {
+        const reviewsContainer = document.getElementById("reviews-container");
+        const prevPageButton = document.getElementById("prev-page");
+        const nextPageButton = document.getElementById("next-page");
+        const paginationDots = document.getElementById("pagination-dots");
+        const showAllButton = document.getElementById("show-all");
+        const showGoogleButton = document.getElementById("show-google");
+        const showYandexButton = document.getElementById("show-yandex");
+        const show2gisButton = document.getElementById("show-2gis");
+        let allReviews = { google: [], yandex: [], "2gis": [] };
+        let filteredReviews = [];
+        let currentPage = 1;
+        const reviewsPerPage = 3;
+        let totalPages = 1;
+        let currentPlatform = "all";
+
+        function loadReviews() {
+          fetch("fetch_reviews.php")
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                console.error("Ошибка при загрузке отзывов:", data.error);
+                reviewsContainer.innerHTML =
+                  "<p>Не удалось загрузить отзывы.</p>";
+                return;
+              }
+
+              // Преобразование yandexReviews в массив, если это объект
+              const yandexReviews = Array.isArray(data.yandexReviews)
+                ? data.yandexReviews
+                : Object.values(data.yandexReviews || {});
+
+              allReviews.google = Array.isArray(data.googleReviews)
+                ? data.googleReviews.slice(0, 6)
+                : [];
+              allReviews.yandex = yandexReviews.slice(0, 6);
+              allReviews["2gis"] = Array.isArray(data["2gisReviews"])
+                ? data["2gisReviews"].slice(0, 6)
+                : [];
+
+              filteredReviews = [
+                ...allReviews.google,
+                ...allReviews.yandex,
+                ...allReviews["2gis"],
+              ];
+              totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+
+              displayReviews();
+              updateSummary(
+                data.averageRatingGoogle,
+                data.averageRatingYandex,
+                data.averageRating2GIS
+              );
+              updatePaginationDots();
+            })
+            .catch((error) => {
+              console.error("Ошибка при загрузке данных:", error);
+              reviewsContainer.innerHTML =
+                "<p>Произошла ошибка при загрузке данных.</p>";
+            });
+        }
+
+        function displayReviews() {
+          reviewsContainer.innerHTML = "";
+
+          if (filteredReviews.length === 0) {
+            reviewsContainer.innerHTML = "<p>Нет доступных отзывов.</p>";
+            return;
+          }
+
+          const sortedReviews = [...filteredReviews].sort(
+            (a, b) => b.rating - a.rating
+          );
+
+          const start = (currentPage - 1) * reviewsPerPage;
+          const end = start + reviewsPerPage;
+          const paginatedReviews = sortedReviews.slice(start, end);
+
+          paginatedReviews.forEach((review) => {
+            const cleanAvatarUrl = review.avatarUrl
+              ? review.avatarUrl.replace(/^\/+|\/+$/g, "")
+              : "";
+            const reviewElement = document.createElement("div");
+            reviewElement.classList.add("review");
+
+            const avatarElement = document.createElement("div");
+            avatarElement.classList.add("review-avatar");
+
+            if (cleanAvatarUrl) {
+              avatarElement.style.backgroundImage = `url(${cleanAvatarUrl})`;
+            } else {
+              avatarElement.textContent = review.author.charAt(0);
             }
-        
-            function displayReviews() {
-                reviewsContainer.innerHTML = '';
-        
-                if (filteredReviews.length === 0) {
-                    reviewsContainer.innerHTML = '<p>Нет доступных отзывов.</p>';
-                    return;
-                }
-        
-                const sortedReviews = [...filteredReviews].sort((a, b) => b.rating - a.rating);
-        
-                const start = (currentPage - 1) * reviewsPerPage;
-                const end = start + reviewsPerPage;
-                const paginatedReviews = sortedReviews.slice(start, end);
-        
-                paginatedReviews.forEach(review => {
-                    const cleanAvatarUrl = review.avatarUrl ? review.avatarUrl.replace(/^\/+|\/+$/g, '') : '';
-                    const reviewElement = document.createElement('div');
-                    reviewElement.classList.add('review');
-        
-                    const avatarElement = document.createElement('div');
-                    avatarElement.classList.add('review-avatar');
-        
-                    if (cleanAvatarUrl) {
-                        avatarElement.style.backgroundImage = `url(${cleanAvatarUrl})`;
-                    } else {
-                        avatarElement.textContent = review.author.charAt(0);
-                    }
-        
-                    reviewElement.innerHTML = `
+
+            reviewElement.innerHTML = `
                         ${avatarElement.outerHTML}
                         <div class="review-content">
                             <div class="review-author">${review.author}</div>
@@ -364,108 +384,122 @@
                             <div class="review-text">${review.reviewText}</div>
                         </div>
                     `;
-        
-                    reviewsContainer.appendChild(reviewElement);
-                });
-        
-                updatePaginationButtons();
-                updatePaginationDots();
-            }
-        
-            function updateSummary(googleRating, yandexRating, twoGisRating) {
-                const summaryElement = document.getElementById('average-rating');
-        
-                const ratings = [googleRating, yandexRating, twoGisRating].filter(r => r !== null && r !== undefined);
-                const averageRating = ratings.reduce((acc, rating) => acc + parseFloat(rating), 0) / ratings.length;
-        
-                summaryElement.innerHTML = `
+
+            reviewsContainer.appendChild(reviewElement);
+          });
+
+          updatePaginationButtons();
+          updatePaginationDots();
+        }
+
+        function updateSummary(googleRating, yandexRating, twoGisRating) {
+          const summaryElement = document.getElementById("average-rating");
+
+          const ratings = [googleRating, yandexRating, twoGisRating].filter(
+            (r) => r !== null && r !== undefined
+          );
+          const averageRating =
+            ratings.reduce((acc, rating) => acc + parseFloat(rating), 0) /
+            ratings.length;
+
+          summaryElement.innerHTML = `
                     Средний рейтинг: ${averageRating.toFixed(1)} <br>
                     Google Maps: ${googleRating} <br>
                     Яндекс Карты: ${yandexRating} <br>
                     2ГИС: ${twoGisRating}
                 `;
+        }
+
+        function updatePaginationDots() {
+          paginationDots.innerHTML = "";
+          for (let i = 1; i <= totalPages; i++) {
+            const dot = document.createElement("div");
+            dot.classList.add("dot");
+            if (i === currentPage) {
+              dot.classList.add("current");
             }
-        
-            function updatePaginationDots() {
-                paginationDots.innerHTML = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    const dot = document.createElement('div');
-                    dot.classList.add('dot');
-                    if (i === currentPage) {
-                        dot.classList.add('current');
-                    }
-                    dot.addEventListener('click', () => {
-                        currentPage = i;
-                        displayReviews();
-                    });
-                    paginationDots.appendChild(dot);
-                }
-            }
-        
-            function updatePaginationButtons() {
-                prevPageButton.disabled = currentPage === 1;
-                nextPageButton.disabled = currentPage === totalPages;
-            }
-        
-            prevPageButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayReviews();
-                }
+            dot.addEventListener("click", () => {
+              currentPage = i;
+              displayReviews();
             });
-        
-            nextPageButton.addEventListener('click', () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayReviews();
-                }
-            });
-        
-            showAllButton.addEventListener('click', () => {
-                currentPlatform = 'all';
-                filteredReviews = [...allReviews.google, ...allReviews.yandex, ...allReviews['2gis']];
-                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-                currentPage = 1;
-                displayReviews();
-                updateFilterButtons();
-            });
-        
-            showGoogleButton.addEventListener('click', () => {
-                currentPlatform = 'google';
-                filteredReviews = allReviews.google;
-                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-                currentPage = 1;
-                displayReviews();
-                updateFilterButtons();
-            });
-        
-            showYandexButton.addEventListener('click', () => {
-                currentPlatform = 'yandex';
-                filteredReviews = allReviews.yandex;
-                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-                currentPage = 1;
-                displayReviews();
-                updateFilterButtons();
-            });
-        
-            show2gisButton.addEventListener('click', () => {
-                currentPlatform = '2gis';
-                filteredReviews = allReviews['2gis'];
-                totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-                currentPage = 1;
-                displayReviews();
-                updateFilterButtons();
-            });
-        
-            function updateFilterButtons() {
-                showAllButton.classList.toggle('active', currentPlatform === 'all');
-                showGoogleButton.classList.toggle('active', currentPlatform === 'google');
-                showYandexButton.classList.toggle('active', currentPlatform === 'yandex');
-                show2gisButton.classList.toggle('active', currentPlatform === '2gis');
-            }
-        
-            loadReviews();
+            paginationDots.appendChild(dot);
+          }
+        }
+
+        function updatePaginationButtons() {
+          prevPageButton.disabled = currentPage === 1;
+          nextPageButton.disabled = currentPage === totalPages;
+        }
+
+        prevPageButton.addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            displayReviews();
+          }
         });
+
+        nextPageButton.addEventListener("click", () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            displayReviews();
+          }
+        });
+
+        showAllButton.addEventListener("click", () => {
+          currentPlatform = "all";
+          filteredReviews = [
+            ...allReviews.google,
+            ...allReviews.yandex,
+            ...allReviews["2gis"],
+          ];
+          totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+          currentPage = 1;
+          displayReviews();
+          updateFilterButtons();
+        });
+
+        showGoogleButton.addEventListener("click", () => {
+          currentPlatform = "google";
+          filteredReviews = allReviews.google;
+          totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+          currentPage = 1;
+          displayReviews();
+          updateFilterButtons();
+        });
+
+        showYandexButton.addEventListener("click", () => {
+          currentPlatform = "yandex";
+          filteredReviews = allReviews.yandex;
+          totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+          currentPage = 1;
+          displayReviews();
+          updateFilterButtons();
+        });
+
+        show2gisButton.addEventListener("click", () => {
+          currentPlatform = "2gis";
+          filteredReviews = allReviews["2gis"];
+          totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+          currentPage = 1;
+          displayReviews();
+          updateFilterButtons();
+        });
+
+        function updateFilterButtons() {
+          showAllButton.classList.toggle("active", currentPlatform === "all");
+          showGoogleButton.classList.toggle(
+            "active",
+            currentPlatform === "google"
+          );
+          showYandexButton.classList.toggle(
+            "active",
+            currentPlatform === "yandex"
+          );
+          show2gisButton.classList.toggle("active", currentPlatform === "2gis");
+        }
+
+        loadReviews();
+      });
     </script>
-</body>
+  </body>
 </html>
