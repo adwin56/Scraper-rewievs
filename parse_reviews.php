@@ -1,5 +1,5 @@
 <?php
-// Укажите URL страницы с отзывами на 2ГИС
+// URL страницы с отзывами на 2ГИС
 $url = 'https://2gis.ru/n_novgorod/inside/2674647933966364/firm/70000001021080960/tab/reviews?m=43.999939%2C56.311007%2F16%2Fp%2F0.3';
 
 // Получение HTML-кода страницы
@@ -54,7 +54,7 @@ foreach ($reviewNodes as $node) {
         'rating' => $rating,
         'reviewText' => trim($reviewText),
         'avatarUrl' => $avatarUrl,
-        'platform' => '2ГИС' // Добавляем строку платформы
+        'platform' => '2ГИС'
     ];
 }
 
